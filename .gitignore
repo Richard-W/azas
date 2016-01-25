@@ -1,0 +1,5 @@
+*.swp
+*.swo
+target
+project/project
+.idea
