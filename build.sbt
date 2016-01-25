@@ -22,3 +22,12 @@ libraryDependencies ++= {
     "io.spray"          %% "spray-testkit"  % sprayVersion  % "test"
   )
 }
+
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
+
+scalariformSettings
+
+ScalariformKeys.preferences := ScalariformKeys.preferences.value
+  .setPreference(AlignSingleLineCaseStatements, true)
+  .setPreference(PreserveSpaceBeforeArguments, true)
