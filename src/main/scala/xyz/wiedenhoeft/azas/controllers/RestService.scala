@@ -16,25 +16,104 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import spray.http.StatusCodes
-import spray.routing.HttpService
+import spray.routing._
+import spray.http._
+import spray.httpx.marshalling._
+import spray.httpx.unmarshalling._
+import spray.httpx.SprayJsonSupport._
+
+import JsonProtocol._
+import xyz.wiedenhoeft.azas.models.Participant
+import xyz.wiedenhoeft.azas.views._
+
+import scala.concurrent._
 
 trait RestService extends HttpService {
 
+  implicit def executor: ExecutionContext
+  implicit def db: Database
+
   val route =
-    path("v1" / "participate") {
+    path("v1" / "addpart") {
+      post {
+        entity(as[AddPartRequest]) { req ⇒
+          complete(handleAddPart(req))
+        }
+      }
+    } ~ path("v1" / "editpart") {
+      post {
+        entity(as[EditPartRequest]) { req ⇒
+          complete(handleEditPart(req))
+        }
+      }
+    } ~ path("v1" / "delpart") {
+      post {
+        entity(as[DelPartRequest]) { req ⇒
+          complete(handleDelPart(req))
+        }
+      }
+    } ~ path("v1" / "addmascot") {
       complete(StatusCodes.NotImplemented)
-    } ~ path("v1" / "mascot") {
+    } ~ path("v1" / "editmascot") {
+      complete(StatusCodes.NotImplemented)
+    } ~ path("v1" / "delmascot") {
       complete(StatusCodes.NotImplemented)
     } ~ path("v1" / "getcouncil") {
       complete(StatusCodes.NotImplemented)
     } ~ path("v1" / "setpriorities") {
       complete(StatusCodes.NotImplemented)
-    } ~ path("v1" / "deletepart") {
-      complete(StatusCodes.NotImplemented)
-    } ~ path("v1" / "deletemascot") {
-      complete(StatusCodes.NotImplemented)
     } ~ path("v1" / "dumpdata") {
       complete(StatusCodes.NotImplemented)
     }
+
+  def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        Participant(
+          "",
+          council.id,
+          req.info
+        ).insert map { _ ⇒
+            StatusCodes.OK
+          }
+    }
+  }
+
+  def handleEditPart(req: EditPartRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        db.findParticipantByID(req.id) flatMap {
+          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case Some(participant) ⇒
+            if (participant.councilId != council.id) {
+              Future.successful(StatusCodes.Unauthorized)
+            } else {
+              participant.copy(info = req.info).update map { _ ⇒
+                StatusCodes.OK
+              }
+            }
+        }
+    }
+  }
+
+  def handleDelPart(req: DelPartRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        db.findParticipantByID(req.id) flatMap {
+          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case Some(participant) ⇒
+            if (participant.councilId != council.id) {
+              Future.successful(StatusCodes.Unauthorized)
+            } else {
+              participant.delete map { _ ⇒
+                StatusCodes.OK
+              }
+            }
+        }
+    }
+  }
 }
+

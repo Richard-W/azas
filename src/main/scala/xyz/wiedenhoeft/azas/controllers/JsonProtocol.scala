@@ -16,22 +16,15 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import akka.actor._
-import spray.routing.{ RoutingSettings, ExceptionHandler }
+import spray.json._
+import xyz.wiedenhoeft.azas.models.PartInfo
+import xyz.wiedenhoeft.azas.views._
 
-object RestServiceActor {
-  def props = Props(classOf[RestServiceActor])
-}
+object JsonProtocol extends DefaultJsonProtocol {
 
-class RestServiceActor extends Actor with RestService {
+  implicit val partInfo = jsonFormat20(PartInfo)
 
-  implicit val routingSettings = RoutingSettings.default
-  implicit val exceptionHandler = ExceptionHandler.default
-  implicit val db = new MockDatabase
-
-  override def receive: Receive = runRoute(route)
-
-  override def actorRefFactory: ActorRefFactory = context
-
-  override def executor = context.dispatcher
+  implicit val addPartRequest = jsonFormat2(AddPartRequest)
+  implicit val editPartRequest = jsonFormat3(EditPartRequest)
+  implicit val delPartRequest = jsonFormat2(DelPartRequest)
 }

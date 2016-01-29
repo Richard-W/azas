@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.controllers
+package xyz.wiedenhoeft.azas.models
 
-import akka.actor._
-import spray.routing.{ RoutingSettings, ExceptionHandler }
+import xyz.wiedenhoeft.azas.controllers.Database
 
-object RestServiceActor {
-  def props = Props(classOf[RestServiceActor])
-}
+import scala.concurrent.ExecutionContext
 
-class RestServiceActor extends Actor with RestService {
+case class Participant(
+    id: String,
+    councilId: String,
+    info: PartInfo
+) {
 
-  implicit val routingSettings = RoutingSettings.default
-  implicit val exceptionHandler = ExceptionHandler.default
-  implicit val db = new MockDatabase
+  def insert(implicit executor: ExecutionContext, db: Database) = db.insertParticipant(this)
 
-  override def receive: Receive = runRoute(route)
+  def update(implicit executor: ExecutionContext, db: Database) = db.updateParticipant(this)
 
-  override def actorRefFactory: ActorRefFactory = context
-
-  override def executor = context.dispatcher
+  def delete(implicit executor: ExecutionContext, db: Database) = db.deleteParticipant(this)
 }
