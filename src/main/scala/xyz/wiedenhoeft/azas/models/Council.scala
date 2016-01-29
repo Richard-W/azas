@@ -16,10 +16,16 @@
  */
 package xyz.wiedenhoeft.azas.models
 
+import xyz.wiedenhoeft.azas.controllers.Database
+
+import scala.concurrent.{ Future, ExecutionContext }
+
 case class Council(
-  id: String,
-  university: String,
-  address: String,
-  email: String,
-  token: String
-)
+    id: String,
+    university: String,
+    address: String,
+    email: String,
+    token: String
+) {
+  def insert(implicit db: Database, executor: ExecutionContext): Future[Council] = db.insertCouncil(this)
+}

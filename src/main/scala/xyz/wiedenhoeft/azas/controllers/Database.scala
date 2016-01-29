@@ -34,6 +34,8 @@ trait Database {
 
   def findAllParticipants(implicit executor: ExecutionContext): Future[Seq[Participant]]
 
+  def insertCouncil(council: Council)(implicit executor: ExecutionContext): Future[Council]
+
   def findCouncilByID(id: String)(implicit executor: ExecutionContext): Future[Option[Council]]
 
   def findCouncilByToken(token: String)(implicit executor: ExecutionContext): Future[Option[Council]]

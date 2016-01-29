@@ -11,15 +11,17 @@ libraryDependencies ++= {
   val sprayVersion = "1.3.3"
 
   Seq(
-    "com.typesafe.akka" %% "akka-actor"     % akkaVersion,
-    "io.spray"          %% "spray-can"      % sprayVersion,
-    "io.spray"          %% "spray-routing"  % sprayVersion,
-    "io.spray"          %% "spray-http"     % sprayVersion,
-    "io.spray"          %% "spray-httpx"    % sprayVersion,
-    "io.spray"          %% "spray-json"     % "1.3.2",
-    "org.scalatest"     %% "scalatest"      % "2.2.6"       % "test",
-    "com.typesafe.akka" %% "akka-testkit"   % akkaVersion   % "test",
-    "io.spray"          %% "spray-testkit"  % sprayVersion  % "test"
+    "com.typesafe.akka" %% "akka-actor"           % akkaVersion,
+    "io.spray"          %% "spray-can"            % sprayVersion,
+    "io.spray"          %% "spray-routing"        % sprayVersion,
+    "io.spray"          %% "spray-http"           % sprayVersion,
+    "io.spray"          %% "spray-httpx"          % sprayVersion,
+    "io.spray"          %% "spray-json"           % "1.3.2",
+    "mysql"              % "mysql-connector-java" % "5.1.38",
+    "com.typesafe"       % "config"               % "1.3.0",
+    "org.scalatest"     %% "scalatest"            % "2.2.6"       % "test",
+    "com.typesafe.akka" %% "akka-testkit"         % akkaVersion   % "test",
+    "io.spray"          %% "spray-testkit"        % sprayVersion  % "test"
   )
 }
 

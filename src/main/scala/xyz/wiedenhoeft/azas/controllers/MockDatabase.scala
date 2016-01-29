@@ -24,6 +24,7 @@ class MockDatabase extends Database {
 
   var participantNextID = 1
   var participants = Seq[Participant]()
+  var councilNextID = 1
   var councils = Seq[Council](
     Council(
       "1",
@@ -41,9 +42,10 @@ class MockDatabase extends Database {
   )
 
   override def insertParticipant(participant: Participant)(implicit executor: ExecutionContext): Future[Participant] = {
-    participants = participants :+ participant.copy(id = participantNextID.toString)
+    val insert = participant.copy(id = participantNextID.toString)
     participantNextID = participantNextID + 1
-    Future.successful(participant)
+    participants = participants :+ insert
+    Future.successful(insert)
   }
 
   override def deleteParticipant(participant: Participant)(implicit executor: ExecutionContext): Future[Unit] = {
@@ -91,5 +93,12 @@ class MockDatabase extends Database {
   def reset = {
     participants = Seq()
     participantNextID = 1
+  }
+
+  override def insertCouncil(council: Council)(implicit executor: ExecutionContext): Future[Council] = {
+    val insert = council.copy(id = councilNextID.toString)
+    councilNextID = councilNextID + 1
+    councils = councils :+ insert
+    Future.successful(insert)
   }
 }

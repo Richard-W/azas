@@ -73,6 +73,7 @@ trait RestService extends HttpService {
         Participant(
           "",
           council.id,
+          false,
           req.info
         ).insert map { _ ⇒
             StatusCodes.OK

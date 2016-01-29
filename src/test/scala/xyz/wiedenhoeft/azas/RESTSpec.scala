@@ -106,4 +106,15 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       response.status should be (StatusCodes.Unauthorized)
     }
   }
+
+  they should "be deletable" in {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+      Await.result(db.findAllParticipants, 5.seconds).length should be (1)
+    }
+
+    Post("/v1/delpart", DelPartRequest("1", "biel")) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      Await.result(db.findAllParticipants, 5.seconds).isEmpty should be (true)
+    }
+  }
 }
