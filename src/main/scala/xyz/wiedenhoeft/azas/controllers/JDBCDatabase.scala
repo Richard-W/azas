@@ -40,7 +40,7 @@ class JDBCDatabase extends Database {
     None
   }
 
-  private def withConnection[T](f: Connection ⇒ T)(implicit executor: ExecutionContext): Future[T] = Future {
+  def withConnection[T](f: Connection ⇒ T)(implicit executor: ExecutionContext): Future[T] = Future {
     val connection = userOption match {
       case Some(user) ⇒
         passOption match {
@@ -87,8 +87,11 @@ class JDBCDatabase extends Database {
       | swimmer,
       | snorer,
       | arrival
-      |FROM participants WHERE """.stripMargin + where, params.toArray
+      |FROM participants WHERE """.stripMargin + where
     )
+    for (i <- params.indices) {
+      stmt.setString(i + 1, params(i))
+    }
     val result = stmt.executeQuery()
     resultHelper[Participant](result) { resultSet ⇒
       Participant(
@@ -130,9 +133,11 @@ class JDBCDatabase extends Database {
         |  address,
         |  email,
         |  token
-        |FROM councils WHERE """.stripMargin + where,
-      params.toArray
+        |FROM councils WHERE """.stripMargin + where
     )
+    for (i <- params.indices) {
+      stmt.setString(i + 1, params(i))
+    }
     val result = stmt.executeQuery()
     resultHelper[Council](result) { resultSet ⇒
       Council(
@@ -254,33 +259,31 @@ class JDBCDatabase extends Database {
         | snorer = ?,
         | arrival = ?
         |WHERE id = ?
-      """.stripMargin,
-      Array(
-        participant.councilId,
-        if (participant.approved) "1" else "0",
-        participant.info.firstName,
-        participant.info.lastName,
-        participant.info.nickName,
-        participant.info.email,
-        participant.info.cell,
-        participant.info.gremium,
-        participant.info.tshirt,
-        participant.info.food,
-        participant.info.allergies,
-        participant.info.excursion1,
-        participant.info.excursion2,
-        participant.info.excursion3,
-        participant.info.dayOfBirth,
-        participant.info.nationality,
-        participant.info.address,
-        participant.info.comment,
-        if (participant.info.zaepfchen) "1" else "0",
-        participant.info.swimmer,
-        participant.info.snorer,
-        participant.info.arrival,
-        participant.id
-      )
+      """.stripMargin
     )
+    stmt.setString(1, participant.councilId)
+    stmt.setString(2, if (participant.approved) "1" else "0")
+    stmt.setString(3, participant.info.firstName)
+    stmt.setString(4, participant.info.lastName)
+    stmt.setString(5, participant.info.nickName)
+    stmt.setString(6, participant.info.email)
+    stmt.setString(7, participant.info.cell)
+    stmt.setString(8, participant.info.gremium)
+    stmt.setString(9, participant.info.tshirt)
+    stmt.setString(10, participant.info.food)
+    stmt.setString(11, participant.info.allergies)
+    stmt.setString(12, participant.info.excursion1)
+    stmt.setString(13, participant.info.excursion2)
+    stmt.setString(14, participant.info.excursion3)
+    stmt.setString(15, participant.info.dayOfBirth)
+    stmt.setString(16, participant.info.nationality)
+    stmt.setString(17, participant.info.address)
+    stmt.setString(18, participant.info.comment)
+    stmt.setString(19, if (participant.info.zaepfchen) "1" else "0")
+    stmt.setString(20, participant.info.swimmer)
+    stmt.setString(21, participant.info.snorer)
+    stmt.setString(22, participant.info.arrival)
+    stmt.setString(23, participant.id)
     stmt.executeUpdate()
     participant
   }
@@ -296,7 +299,7 @@ class JDBCDatabase extends Database {
   def initializeTables(implicit executor: ExecutionContext) = withConnection { conn ⇒
     val participantTable = conn.prepareStatement(
       """
-        |CREATE TABLE IF NOT EXISTS participations (
+        |CREATE TABLE IF NOT EXISTS participants (
         | id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         | councilId INT NOT NULL,
         | approved INT NOT NULL,
@@ -323,7 +326,7 @@ class JDBCDatabase extends Database {
         |)
       """.stripMargin
     )
-    if (!participantTable.execute()) throw new DatabaseException("Table participants failed to initialize")
+    participantTable.executeUpdate()
     val councilTable = conn.prepareStatement(
       """
         |CREATE TABLE IF NOT EXISTS councils (
@@ -336,7 +339,7 @@ class JDBCDatabase extends Database {
         |)
       """.stripMargin
     )
-    if (!councilTable.execute()) throw new DatabaseException("Table councils failed to initialize")
+    councilTable.executeUpdate()
   }
 
   override def insertCouncil(council: Council)(implicit executor: ExecutionContext): Future[Council] = withConnection { conn ⇒
@@ -348,9 +351,12 @@ class JDBCDatabase extends Database {
         | email,
         | token
         |) VALUES (?, ?, ?, ?)
-      """.stripMargin,
-      Array(council.university, council.address, council.email, council.token)
+      """.stripMargin
     )
+    stmt.setString(1, council.university)
+    stmt.setString(2, council.address)
+    stmt.setString(3, council.email)
+    stmt.setString(4, council.token)
     stmt.executeUpdate()
     val idSet = stmt.getGeneratedKeys
     if (idSet.next()) {

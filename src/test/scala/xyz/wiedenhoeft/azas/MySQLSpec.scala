@@ -25,9 +25,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import xyz.wiedenhoeft.azas.controllers.JDBCDatabase
 
-class MySQLSpec extends FlatSpec with Matchers {
+class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   implicit val db = new JDBCDatabase
   Await.result(db.initializeTables, 5.seconds)
+
+  override def afterAll(): Unit = {
+    Await.result(db.withConnection { conn ⇒
+      conn.prepareStatement("DROP ALL OBJECTS DELETE FILES").executeUpdate()
+    }, 5.seconds)
+  }
 
   val bielefeldId = Await.result(Council(
     "",
@@ -76,5 +82,29 @@ class MySQLSpec extends FlatSpec with Matchers {
       testInfo
     ).insert, 5.seconds)
     Await.result(db.findParticipantByID(inserted.id), 5.seconds).get should be (inserted)
+  }
+
+  they should "be editable" in {
+    val inserted = Await.result(Participant(
+      "",
+      bielefeldId,
+      false,
+      testInfo
+    ).insert, 5.seconds)
+    val updated = inserted.copy(info = testInfo.copy(firstName = "Rudolph"))
+    Await.result(updated.update, 5.seconds)
+    val fetched = Await.result(db.findParticipantByID(updated.id), 5.seconds).get
+    fetched should be (updated)
+  }
+
+  they should "be deletable" in {
+    val inserted = Await.result(Participant(
+      "",
+      bielefeldId,
+      false,
+      testInfo
+    ).insert, 5.seconds)
+    Await.result(db.deleteParticipant(inserted), 5.seconds)
+    Await.result(db.findParticipantByID(inserted.id), 5.seconds) should be (None)
   }
 }
