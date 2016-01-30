@@ -27,8 +27,9 @@ import scala.concurrent.duration._
 object Boot extends App {
 
   implicit val system = ActorSystem("azas")
+  val db = new JDBCDatabase
 
-  val service = system.actorOf(RestServiceActor.props)
+  val service = system.actorOf(RestServiceActor.props(db))
 
   implicit val timeout = Timeout(5.seconds)
   IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = 8080)

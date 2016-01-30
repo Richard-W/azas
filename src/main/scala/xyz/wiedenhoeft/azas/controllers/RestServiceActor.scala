@@ -20,14 +20,13 @@ import akka.actor._
 import spray.routing.{ RoutingSettings, ExceptionHandler }
 
 object RestServiceActor {
-  def props = Props(classOf[RestServiceActor])
+  def props(db: Database) = Props(classOf[RestServiceActor], db)
 }
 
-class RestServiceActor extends Actor with RestService {
+class RestServiceActor(implicit val db: Database) extends Actor with RestService {
 
   implicit val routingSettings = RoutingSettings.default
   implicit val exceptionHandler = ExceptionHandler.default
-  implicit val db = new MockDatabase
 
   override def receive: Receive = runRoute(route)
 
