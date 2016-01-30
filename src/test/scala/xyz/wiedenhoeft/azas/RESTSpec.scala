@@ -118,11 +118,23 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     }
   }
 
+  they should "have priorities" in {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+      response.status should be(StatusCodes.OK)
+      val inserted = Await.result(db.findAllParticipants, 5.seconds).head
+      inserted.priority should be (0)
+    }
+
+    Post("/v1/setpriority", SetPriorityRequest("biel", "1", 50)) ~> route ~> check {
+      response.status should be(StatusCodes.OK)
+      val inserted = Await.result(db.findAllParticipants, 5.seconds).head
+      inserted.priority should be (50)
+    }
+  }
+
   "Council information" should "be available" in {
     Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
       response.status should be (StatusCodes.OK)
-      val participant = Await.result(db.findAllParticipants, 5.seconds).head
-      participant.info should be (testInfo)
     }
 
     Post("/v1/getcouncil", GetCouncilRequest("biel")) ~> route ~> check {

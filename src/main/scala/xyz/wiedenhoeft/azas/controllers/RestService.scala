@@ -64,8 +64,12 @@ trait RestService extends HttpService {
           complete(handleGetCouncil(req))
         }
       }
-    } ~ path("v1" / "setpriorities") {
-      complete(StatusCodes.NotImplemented)
+    } ~ path("v1" / "setpriority") {
+      post {
+        entity(as[SetPriorityRequest]) { req ⇒
+          complete(handleSetPriority(req))
+        }
+      }
     } ~ path("v1" / "dumpdata") {
       complete(StatusCodes.NotImplemented)
     }
@@ -127,7 +131,25 @@ trait RestService extends HttpService {
       case None ⇒ Future.successful(Left(StatusCodes.Unauthorized))
       case Some(council) ⇒
         db.findParticipantByCouncil(council) map { participants ⇒
-          Right(GetCouncilResponse(council, participants))
+          Right(GetCouncilResponse(council, participants.sortBy(_.priority)))
+        }
+    }
+  }
+
+  def handleSetPriority(req: SetPriorityRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        db.findParticipantByID(req.participantId) flatMap {
+          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case Some(participant) ⇒
+            if (participant.councilId != council.id) {
+              Future.successful(StatusCodes.Unauthorized)
+            } else {
+              participant.copy(priority = req.priority).update map { _ ⇒
+                StatusCodes.OK
+              }
+            }
         }
     }
   }
