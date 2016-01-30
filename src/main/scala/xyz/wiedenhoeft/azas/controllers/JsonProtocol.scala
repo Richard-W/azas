@@ -24,7 +24,7 @@ object JsonProtocol extends DefaultJsonProtocol {
 
   implicit val partInfo = jsonFormat20(PartInfo)
   implicit val council = jsonFormat5(Council)
-  implicit val participant = jsonFormat4(Participant)
+  implicit val participant = jsonFormat5(Participant)
 
   implicit val addPartRequest = jsonFormat2(AddPartRequest)
   implicit val editPartRequest = jsonFormat3(EditPartRequest)

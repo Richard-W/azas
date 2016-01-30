@@ -78,6 +78,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val inserted = Await.result(Participant(
       "",
       bielefeldId,
+      0,
       false,
       testInfo
     ).insert, 5.seconds)
@@ -88,6 +89,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val inserted = Await.result(Participant(
       "",
       bielefeldId,
+      0,
       false,
       testInfo
     ).insert, 5.seconds)
@@ -101,6 +103,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val inserted = Await.result(Participant(
       "",
       bielefeldId,
+      0,
       false,
       testInfo
     ).insert, 5.seconds)

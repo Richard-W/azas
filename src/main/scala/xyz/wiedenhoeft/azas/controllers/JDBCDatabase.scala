@@ -66,6 +66,7 @@ class JDBCDatabase extends Database {
       |SELECT
       | id,
       | councilId,
+      | priority,
       | approved,
       | firstName,
       | lastName,
@@ -97,6 +98,7 @@ class JDBCDatabase extends Database {
       Participant(
         resultSet.getInt("id").toString,
         resultSet.getInt("councilId").toString,
+        resultSet.getInt("priority"),
         if (resultSet.getInt("approved") == 1) true else false,
         PartInfo(
           resultSet.getString("firstName"),
@@ -155,6 +157,7 @@ class JDBCDatabase extends Database {
       """
         |INSERT INTO participants (
         | councilId,
+        | priority,
         | approved,
         | firstName,
         | lastName,
@@ -176,31 +179,32 @@ class JDBCDatabase extends Database {
         | swimmer,
         | snorer,
         | arrival
-        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       """.stripMargin
     )
     stmt.setInt(1, participant.councilId.toInt)
-    stmt.setInt(2, if (participant.approved) 1 else 0)
-    stmt.setString(3, participant.info.firstName)
-    stmt.setString(4, participant.info.lastName)
-    stmt.setString(5, participant.info.nickName)
-    stmt.setString(6, participant.info.email)
-    stmt.setString(7, participant.info.cell)
-    stmt.setString(8, participant.info.gremium)
-    stmt.setString(9, participant.info.tshirt)
-    stmt.setString(10, participant.info.food)
-    stmt.setString(11, participant.info.allergies)
-    stmt.setString(12, participant.info.excursion1)
-    stmt.setString(13, participant.info.excursion2)
-    stmt.setString(14, participant.info.excursion3)
-    stmt.setString(15, participant.info.dayOfBirth)
-    stmt.setString(16, participant.info.nationality)
-    stmt.setString(17, participant.info.address)
-    stmt.setString(18, participant.info.comment)
-    stmt.setInt(19, if (participant.info.zaepfchen) 1 else 0)
-    stmt.setString(20, participant.info.swimmer)
-    stmt.setString(21, participant.info.snorer)
-    stmt.setString(22, participant.info.arrival)
+    stmt.setInt(2, participant.priority)
+    stmt.setInt(3, if (participant.approved) 1 else 0)
+    stmt.setString(4, participant.info.firstName)
+    stmt.setString(5, participant.info.lastName)
+    stmt.setString(6, participant.info.nickName)
+    stmt.setString(7, participant.info.email)
+    stmt.setString(8, participant.info.cell)
+    stmt.setString(9, participant.info.gremium)
+    stmt.setString(10, participant.info.tshirt)
+    stmt.setString(11, participant.info.food)
+    stmt.setString(12, participant.info.allergies)
+    stmt.setString(13, participant.info.excursion1)
+    stmt.setString(14, participant.info.excursion2)
+    stmt.setString(15, participant.info.excursion3)
+    stmt.setString(16, participant.info.dayOfBirth)
+    stmt.setString(17, participant.info.nationality)
+    stmt.setString(18, participant.info.address)
+    stmt.setString(19, participant.info.comment)
+    stmt.setInt(20, if (participant.info.zaepfchen) 1 else 0)
+    stmt.setString(21, participant.info.swimmer)
+    stmt.setString(22, participant.info.snorer)
+    stmt.setString(23, participant.info.arrival)
     stmt.executeUpdate()
     val idSet = stmt.getGeneratedKeys
     if (idSet.next()) {
@@ -237,6 +241,7 @@ class JDBCDatabase extends Database {
       """
         |UPDATE participants SET
         | councilId = ?,
+        | priority = ?,
         | approved = ?,
         | firstName = ?,
         | lastName = ?,
@@ -262,28 +267,29 @@ class JDBCDatabase extends Database {
       """.stripMargin
     )
     stmt.setString(1, participant.councilId)
-    stmt.setString(2, if (participant.approved) "1" else "0")
-    stmt.setString(3, participant.info.firstName)
-    stmt.setString(4, participant.info.lastName)
-    stmt.setString(5, participant.info.nickName)
-    stmt.setString(6, participant.info.email)
-    stmt.setString(7, participant.info.cell)
-    stmt.setString(8, participant.info.gremium)
-    stmt.setString(9, participant.info.tshirt)
-    stmt.setString(10, participant.info.food)
-    stmt.setString(11, participant.info.allergies)
-    stmt.setString(12, participant.info.excursion1)
-    stmt.setString(13, participant.info.excursion2)
-    stmt.setString(14, participant.info.excursion3)
-    stmt.setString(15, participant.info.dayOfBirth)
-    stmt.setString(16, participant.info.nationality)
-    stmt.setString(17, participant.info.address)
-    stmt.setString(18, participant.info.comment)
-    stmt.setString(19, if (participant.info.zaepfchen) "1" else "0")
-    stmt.setString(20, participant.info.swimmer)
-    stmt.setString(21, participant.info.snorer)
-    stmt.setString(22, participant.info.arrival)
-    stmt.setString(23, participant.id)
+    stmt.setInt(2, participant.priority)
+    stmt.setString(3, if (participant.approved) "1" else "0")
+    stmt.setString(4, participant.info.firstName)
+    stmt.setString(5, participant.info.lastName)
+    stmt.setString(6, participant.info.nickName)
+    stmt.setString(7, participant.info.email)
+    stmt.setString(8, participant.info.cell)
+    stmt.setString(9, participant.info.gremium)
+    stmt.setString(10, participant.info.tshirt)
+    stmt.setString(11, participant.info.food)
+    stmt.setString(12, participant.info.allergies)
+    stmt.setString(13, participant.info.excursion1)
+    stmt.setString(14, participant.info.excursion2)
+    stmt.setString(15, participant.info.excursion3)
+    stmt.setString(16, participant.info.dayOfBirth)
+    stmt.setString(17, participant.info.nationality)
+    stmt.setString(18, participant.info.address)
+    stmt.setString(19, participant.info.comment)
+    stmt.setString(20, if (participant.info.zaepfchen) "1" else "0")
+    stmt.setString(21, participant.info.swimmer)
+    stmt.setString(22, participant.info.snorer)
+    stmt.setString(23, participant.info.arrival)
+    stmt.setString(24, participant.id)
     stmt.executeUpdate()
     participant
   }
@@ -302,6 +308,7 @@ class JDBCDatabase extends Database {
         |CREATE TABLE IF NOT EXISTS participants (
         | id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         | councilId INT NOT NULL,
+        | priority INT NOT NULL,
         | approved INT NOT NULL,
         | firstName TEXT NOT NULL,
         | lastName TEXT NOT NULL,

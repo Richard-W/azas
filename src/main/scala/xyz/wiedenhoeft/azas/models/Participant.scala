@@ -23,6 +23,7 @@ import scala.concurrent.ExecutionContext
 case class Participant(
     id: String,
     councilId: String,
+    priority: Int,
     approved: Boolean,
     info: PartInfo
 ) {
