@@ -14,21 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.controllers
+package xyz.wiedenhoeft.azas.views
 
-import spray.json._
-import xyz.wiedenhoeft.azas.models.{ Participant, Council, PartInfo }
-import xyz.wiedenhoeft.azas.views._
+import xyz.wiedenhoeft.azas.models.{ Participant, Council }
 
-object JsonProtocol extends DefaultJsonProtocol {
-
-  implicit val partInfo = jsonFormat20(PartInfo)
-  implicit val council = jsonFormat5(Council)
-  implicit val participant = jsonFormat4(Participant)
-
-  implicit val addPartRequest = jsonFormat2(AddPartRequest)
-  implicit val editPartRequest = jsonFormat3(EditPartRequest)
-  implicit val delPartRequest = jsonFormat2(DelPartRequest)
-  implicit val getCouncilRequest = jsonFormat1(GetCouncilRequest)
-  implicit val getCouncilResponse = jsonFormat2(GetCouncilResponse)
-}
+case class GetCouncilResponse(
+  council: Council,
+  participants: Seq[Participant]
+)

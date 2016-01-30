@@ -117,4 +117,19 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       Await.result(db.findAllParticipants, 5.seconds).isEmpty should be (true)
     }
   }
+
+  "Council information" should "be available" in {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      val participant = Await.result(db.findAllParticipants, 5.seconds).head
+      participant.info should be (testInfo)
+    }
+
+    Post("/v1/getcouncil", GetCouncilRequest("biel")) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      val info = responseAs[GetCouncilResponse]
+      info.council.token should be ("biel")
+      info.participants.isEmpty should be (false)
+    }
+  }
 }

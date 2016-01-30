@@ -59,7 +59,11 @@ trait RestService extends HttpService {
     } ~ path("v1" / "delmascot") {
       complete(StatusCodes.NotImplemented)
     } ~ path("v1" / "getcouncil") {
-      complete(StatusCodes.NotImplemented)
+      post {
+        entity(as[GetCouncilRequest]) { req ⇒
+          complete(handleGetCouncil(req))
+        }
+      }
     } ~ path("v1" / "setpriorities") {
       complete(StatusCodes.NotImplemented)
     } ~ path("v1" / "dumpdata") {
@@ -113,6 +117,16 @@ trait RestService extends HttpService {
                 StatusCodes.OK
               }
             }
+        }
+    }
+  }
+
+  def handleGetCouncil(req: GetCouncilRequest): Future[Either[StatusCode, GetCouncilResponse]] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(Left(StatusCodes.Unauthorized))
+      case Some(council) ⇒
+        db.findParticipantByCouncil(council) map { participants ⇒
+          Right(GetCouncilResponse(council, participants))
         }
     }
   }
