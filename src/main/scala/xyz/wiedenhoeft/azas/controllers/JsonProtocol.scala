@@ -31,6 +31,6 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val editPartRequest = jsonFormat3(EditPartRequest)
   implicit val delPartRequest = jsonFormat2(DelPartRequest)
   implicit val getCouncilRequest = jsonFormat1(GetCouncilRequest)
-  implicit val getCouncilResponse = jsonFormat2(GetCouncilResponse)
+  implicit val getCouncilResponse = jsonFormat3(GetCouncilResponse)
   implicit val setPriorityRequest = jsonFormat3(SetPriorityRequest)
 }

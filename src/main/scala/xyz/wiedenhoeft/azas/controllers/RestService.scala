@@ -130,8 +130,10 @@ trait RestService extends HttpService {
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ Future.successful(Left(StatusCodes.Unauthorized))
       case Some(council) ⇒
-        db.findParticipantByCouncil(council) map { participants ⇒
-          Right(GetCouncilResponse(council, participants.sortBy(_.priority)))
+        db.findParticipantByCouncil(council) flatMap { participants ⇒
+          db.findMascotsByCouncil(council) map { mascots ⇒
+            Right(GetCouncilResponse(council, participants.sortBy(_.priority), mascots))
+          }
         }
     }
   }
