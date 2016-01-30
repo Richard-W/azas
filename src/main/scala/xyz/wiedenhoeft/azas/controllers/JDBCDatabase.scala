@@ -19,7 +19,7 @@ package xyz.wiedenhoeft.azas.controllers
 import java.sql.{ ResultSet, Connection, DriverManager }
 
 import com.typesafe.config.ConfigFactory
-import xyz.wiedenhoeft.azas.models.{ PartInfo, Participant, Council }
+import xyz.wiedenhoeft.azas.models._
 
 import scala.annotation.tailrec
 import scala.concurrent.{ Future, ExecutionContext }
@@ -148,6 +148,30 @@ class JDBCDatabase extends Database {
         resultSet.getString("address"),
         resultSet.getString("email"),
         resultSet.getString("token")
+      )
+    }
+  }
+
+  private def mascotQuery(where: String, params: Seq[String] = Seq())(implicit conn: Connection): Seq[Mascot] = {
+    val stmt = conn.prepareStatement(
+      """
+        |SELECT
+        | id,
+        | councilId,
+        | fullName,
+        | nickName
+        |FROM mascots WHERE """.stripMargin + where
+    )
+    for (i <- params.indices) {
+      stmt.setString(i + 1, params(i))
+    }
+    val result = stmt.executeQuery
+    resultHelper[Mascot](result) { resultSet ⇒
+      Mascot(
+        resultSet.getInt("id").toString,
+        resultSet.getInt("councilId").toString,
+        resultSet.getString("fullName"),
+        resultSet.getString("nickName")
       )
     }
   }
@@ -347,6 +371,17 @@ class JDBCDatabase extends Database {
       """.stripMargin
     )
     councilTable.executeUpdate()
+    val mascotTable = conn.prepareStatement(
+      """
+        |CREATE TABLE IF NOT EXISTS mascots (
+        | id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        | councilId INT NOT NULL,
+        | fullName TEXT NOT NULL,
+        | nickName TEXT NOT NULL
+        |)
+      """.stripMargin
+    )
+    mascotTable.executeUpdate()
   }
 
   override def insertCouncil(council: Council)(implicit executor: ExecutionContext): Future[Council] = withConnection { conn ⇒
@@ -371,5 +406,63 @@ class JDBCDatabase extends Database {
     } else {
       throw new DatabaseException("Invalid response from MySQL server")
     }
+  }
+
+  override def insertMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot] = withConnection { conn ⇒
+    val stmt = conn.prepareStatement(
+      """
+        |INSERT INTO mascots (
+        | councilId,
+        | fullName,
+        | nickName
+        |) VALUES (?, ?, ?)
+      """.stripMargin
+    )
+    stmt.setInt(1, mascot.councilId.toInt)
+    stmt.setString(2, mascot.fullName)
+    stmt.setString(3, mascot.nickName)
+    stmt.executeUpdate()
+    val idSet = stmt.getGeneratedKeys
+    if (idSet.next()) {
+      mascot.copy(id = idSet.getInt(1).toString)
+    } else {
+      throw new DatabaseException("Invalid response from MySQL server")
+    }
+  }
+
+  override def findMascotByID(id: String)(implicit executor: ExecutionContext): Future[Option[Mascot]] = withConnection { implicit conn ⇒
+    mascotQuery("id = ?", Seq(id)).headOption
+  }
+
+  override def updateMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot] = withConnection { conn ⇒
+    val stmt = conn.prepareStatement(
+      """
+        |UPDATE mascots SET
+        | councilId = ?,
+        | fullName = ?,
+        | nickName = ?
+        |WHERE id = ?
+      """.stripMargin
+    )
+    stmt.setInt(1, mascot.councilId.toInt)
+    stmt.setString(2, mascot.fullName)
+    stmt.setString(3, mascot.nickName)
+    stmt.setInt(4, mascot.id.toInt)
+    stmt.executeUpdate()
+    mascot
+  }
+
+  override def deleteMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Unit] = withConnection { conn ⇒
+    val stmt = conn.prepareStatement("DELETE FROM mascots WHERE id = ?")
+    stmt.setInt(1, mascot.id.toInt)
+    stmt.executeUpdate()
+  }
+
+  override def findAllMascots(implicit executor: ExecutionContext): Future[Seq[Mascot]] = withConnection { implicit conn ⇒
+    mascotQuery("'1' = '1'")
+  }
+
+  override def findMascotsByCouncil(council: Council)(implicit executor: ExecutionContext): Future[Seq[Mascot]] = withConnection { implicit conn ⇒
+    mascotQuery("councilId = ?", Seq(council.id))
   }
 }

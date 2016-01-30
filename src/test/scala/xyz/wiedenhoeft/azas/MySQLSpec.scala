@@ -17,7 +17,7 @@
 package xyz.wiedenhoeft.azas
 
 import org.scalatest._
-import xyz.wiedenhoeft.azas.models.{ PartInfo, Council, Participant }
+import xyz.wiedenhoeft.azas.models.{ Mascot, PartInfo, Council, Participant }
 
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -74,7 +74,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     arrival = "garnicht, da nichtexistent"
   )
 
-  "Participants" should "be addable" in {
+  "Participants" should "be insertable" in {
     val inserted = Await.result(Participant(
       "",
       bielefeldId,
@@ -82,6 +82,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       false,
       testInfo
     ).insert, 5.seconds)
+    Await.result(db.findAllParticipants, 5.seconds).isEmpty should be (false)
     Await.result(db.findParticipantByID(inserted.id), 5.seconds).get should be (inserted)
   }
 
@@ -109,5 +110,39 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ).insert, 5.seconds)
     Await.result(db.deleteParticipant(inserted), 5.seconds)
     Await.result(db.findParticipantByID(inserted.id), 5.seconds) should be (None)
+  }
+
+  "Mascots" should "be insertable" in {
+    val inserted = Await.result(Mascot(
+      "",
+      jenaId,
+      "Frankfurter Bembel",
+      "woistdasteil?"
+    ).insert, 5.seconds)
+    Await.result(db.findAllMascots, 5.seconds).isEmpty should be (false)
+    Await.result(db.findMascotByID(inserted.id), 5.seconds).get should be (inserted)
+  }
+
+  they should "be updatable" in {
+    val inserted = Await.result(Mascot(
+      "",
+      jenaId,
+      "Frankfurter Bembel",
+      "woistdasteil?"
+    ).insert, 5.seconds)
+    val updated = inserted.copy(nickName = "ihrklauschweine!")
+    Await.result(updated.update, 5.seconds)
+    Await.result(db.findMascotByID(inserted.id), 5.seconds).get should be (updated)
+  }
+
+  they should "be deletable" in {
+    val inserted = Await.result(Mascot(
+      "",
+      jenaId,
+      "Frankfurter Bembel",
+      "woistdasteil?"
+    ).insert, 5.seconds)
+    Await.result(inserted.delete, 5.seconds)
+    Await.result(db.findMascotByID(inserted.id), 5.seconds).isDefined should be (false)
   }
 }

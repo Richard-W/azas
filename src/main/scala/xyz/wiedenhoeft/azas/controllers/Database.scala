@@ -41,6 +41,18 @@ trait Database {
   def findCouncilByToken(token: String)(implicit executor: ExecutionContext): Future[Option[Council]]
 
   def findAllCouncils(implicit executor: ExecutionContext): Future[Seq[Council]]
+
+  def insertMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot]
+
+  def updateMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot]
+
+  def deleteMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Unit]
+
+  def findAllMascots(implicit executor: ExecutionContext): Future[Seq[Mascot]]
+
+  def findMascotByID(id: String)(implicit executor: ExecutionContext): Future[Option[Mascot]]
+
+  def findMascotsByCouncil(council: Council)(implicit executor: ExecutionContext): Future[Seq[Mascot]]
 }
 
 class DatabaseException(message: String) extends Exception(message)

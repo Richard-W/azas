@@ -14,25 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.controllers
+package xyz.wiedenhoeft.azas.models
 
-import akka.actor._
-import akka.io.IO
-import akka.pattern.ask
-import akka.util.Timeout
-import spray.can.Http
+import xyz.wiedenhoeft.azas.controllers.Database
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext
 
-object Boot extends App {
+case class Mascot(
+    id: String,
+    councilId: String,
+    fullName: String,
+    nickName: String
+) {
 
-  implicit val system = ActorSystem("azas")
-  val db = new JDBCDatabase
-  Await.result(db.initializeTables(system.dispatcher), 5.seconds)
-
-  val service = system.actorOf(RestServiceActor.props(db))
-
-  implicit val timeout = Timeout(5.seconds)
-  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = 8080)
+  def insert(implicit executor: ExecutionContext, db: Database) = db.insertMascot(this)
+  def update(implicit executor: ExecutionContext, db: Database) = db.updateMascot(this)
+  def delete(implicit executor: ExecutionContext, db: Database) = db.deleteMascot(this)
 }

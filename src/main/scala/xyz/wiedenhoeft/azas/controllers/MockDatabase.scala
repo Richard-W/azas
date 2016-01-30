@@ -16,7 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import xyz.wiedenhoeft.azas.models.{ Council, Participant }
+import xyz.wiedenhoeft.azas.models.{ Mascot, Council, Participant }
 
 import scala.concurrent.{ Future, ExecutionContext }
 
@@ -40,6 +40,8 @@ class MockDatabase extends Database {
       "jena"
     )
   )
+  var mascotNextID = 1
+  var mascots = Seq[Mascot]()
 
   override def insertParticipant(participant: Participant)(implicit executor: ExecutionContext): Future[Participant] = {
     val insert = participant.copy(id = participantNextID.toString)
@@ -100,5 +102,34 @@ class MockDatabase extends Database {
     councilNextID = councilNextID + 1
     councils = councils :+ insert
     Future.successful(insert)
+  }
+
+  override def insertMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot] = {
+    val insert = mascot.copy(id = mascotNextID.toString)
+    mascotNextID = mascotNextID + 1
+    mascots = mascots :+ insert
+    Future.successful(insert)
+  }
+
+  override def findMascotByID(id: String)(implicit executor: ExecutionContext): Future[Option[Mascot]] = {
+    Future.successful(mascots.find(_.id == id))
+  }
+
+  override def updateMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Mascot] = {
+    mascots = mascots.filter(_.id != mascot.id) :+ mascot
+    Future.successful(mascot)
+  }
+
+  override def deleteMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Unit] = {
+    mascots = mascots.filter(_.id != mascot.id) :+ mascot
+    Future.successful(Unit)
+  }
+
+  override def findAllMascots(implicit executor: ExecutionContext): Future[Seq[Mascot]] = {
+    Future.successful(mascots)
+  }
+
+  override def findMascotsByCouncil(council: Council)(implicit executor: ExecutionContext): Future[Seq[Mascot]] = {
+    Future.successful(mascots.filter(_.councilId == council.id))
   }
 }

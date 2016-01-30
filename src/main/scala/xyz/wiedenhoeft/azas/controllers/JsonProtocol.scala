@@ -17,7 +17,7 @@
 package xyz.wiedenhoeft.azas.controllers
 
 import spray.json._
-import xyz.wiedenhoeft.azas.models.{ Participant, Council, PartInfo }
+import xyz.wiedenhoeft.azas.models._
 import xyz.wiedenhoeft.azas.views._
 
 object JsonProtocol extends DefaultJsonProtocol {
@@ -25,6 +25,7 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val partInfo = jsonFormat20(PartInfo)
   implicit val council = jsonFormat5(Council)
   implicit val participant = jsonFormat5(Participant)
+  implicit val mascot = jsonFormat4(Mascot)
 
   implicit val addPartRequest = jsonFormat2(AddPartRequest)
   implicit val editPartRequest = jsonFormat3(EditPartRequest)
