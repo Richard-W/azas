@@ -20,6 +20,7 @@ import akka.actor._
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -27,12 +28,22 @@ import scala.concurrent.duration._
 
 object Boot extends App {
 
+  val config = ConfigFactory.load
+
   implicit val system = ActorSystem("azas")
-  val db = new JDBCDatabase
-  Await.result(db.initializeTables(system.dispatcher), 5.seconds)
+
+  var db: JDBCDatabase = null
+  try {
+    db = new JDBCDatabase
+    Await.result(db.initializeTables(system.dispatcher), 5.seconds)
+  } catch {
+    case e: Exception ⇒
+      Await.result(system.terminate(), 5.seconds)
+      throw e
+  }
 
   val service = system.actorOf(RestServiceActor.props(db))
 
   implicit val timeout = Timeout(5.seconds)
-  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = 8080)
+  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = config.getInt("http.port"))
 }
