@@ -21,8 +21,8 @@ import spray.http._
 import spray.testkit._
 import spray.httpx.SprayJsonSupport._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
-import xyz.wiedenhoeft.azas.controllers.{ RestService, MockDatabase }
-import xyz.wiedenhoeft.azas.models.PartInfo
+import xyz.wiedenhoeft.azas.controllers.RestService
+import xyz.wiedenhoeft.azas.models.{ Mascot, PartInfo }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -140,8 +140,43 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     Post("/v1/getcouncil", GetCouncilRequest("biel")) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       val info = responseAs[GetCouncilResponse]
-      info.council.token should be ("biel")
-      info.participants.isEmpty should be (false)
+      info.council.token should be("biel")
+      info.participants.isEmpty should be(false)
+    }
+  }
+
+  "Mascots" should "be insertable" in {
+    Post("/v1/addmascot", AddMascotRequest("biel", "irgendwas viel längeres als Kwawak", "Kwawak")) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      Await.result(db.findAllMascots, 5.seconds).head.nickName should be ("Kwawak")
+    }
+  }
+
+  they should "be editable" in {
+    val council = Await.result(db.findCouncilByToken("biel"), 5.seconds).get
+    val inserted = Await.result(Mascot(
+      "",
+      council.id,
+      "Bla",
+      "Blub"
+    ).insert, 5.seconds)
+    Post("/v1/editmascot", EditMascotRequest(inserted.id, council.token, "irgendwas viel längeres als Kwawak", "Kwawak")) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      Await.result(db.findMascotByID(inserted.id), 5.seconds).get.nickName should be ("Kwawak")
+    }
+  }
+
+  they should "be deletable" in {
+    val council = Await.result(db.findCouncilByToken("biel"), 5.seconds).get
+    val inserted = Await.result(Mascot(
+      "",
+      council.id,
+      "Bla",
+      "Blub"
+    ).insert, 5.seconds)
+    Post("/v1/delmascot", DelMascotRequest(council.token, inserted.id)) ~> route ~> check {
+      response.status should be(StatusCodes.OK)
+      Await.result(db.findMascotByID(inserted.id), 5.seconds) should be (None)
     }
   }
 }

@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.controllers
+package xyz.wiedenhoeft.azas
 
-import xyz.wiedenhoeft.azas.models.{ Mascot, Council, Participant }
+import xyz.wiedenhoeft.azas.controllers.{ Database, DatabaseException }
+import xyz.wiedenhoeft.azas.models.{ Council, Mascot, Participant }
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{ ExecutionContext, Future }
 
 class MockDatabase extends Database {
 
@@ -121,7 +122,7 @@ class MockDatabase extends Database {
   }
 
   override def deleteMascot(mascot: Mascot)(implicit executor: ExecutionContext): Future[Unit] = {
-    mascots = mascots.filter(_.id != mascot.id) :+ mascot
+    mascots = mascots.filter(_.id != mascot.id)
     Future.successful(Unit)
   }
 

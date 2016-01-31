@@ -23,7 +23,7 @@ import spray.httpx.unmarshalling._
 import spray.httpx.SprayJsonSupport._
 
 import JsonProtocol._
-import xyz.wiedenhoeft.azas.models.Participant
+import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -53,11 +53,23 @@ trait RestService extends HttpService {
         }
       }
     } ~ path("v1" / "addmascot") {
-      complete(StatusCodes.NotImplemented)
+      post {
+        entity(as[AddMascotRequest]) { req ⇒
+          complete(handleAddMascot(req))
+        }
+      }
     } ~ path("v1" / "editmascot") {
-      complete(StatusCodes.NotImplemented)
+      post {
+        entity(as[EditMascotRequest]) { req ⇒
+          complete(handleEditMascot(req))
+        }
+      }
     } ~ path("v1" / "delmascot") {
-      complete(StatusCodes.NotImplemented)
+      post {
+        entity(as[DelMascotRequest]) { req ⇒
+          complete(handleDelMascot(req))
+        }
+      }
     } ~ path("v1" / "getcouncil") {
       post {
         entity(as[GetCouncilRequest]) { req ⇒
@@ -149,6 +161,57 @@ trait RestService extends HttpService {
               Future.successful(StatusCodes.Unauthorized)
             } else {
               participant.copy(priority = req.priority).update map { _ ⇒
+                StatusCodes.OK
+              }
+            }
+        }
+    }
+  }
+
+  def handleAddMascot(req: AddMascotRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        Mascot(
+          "",
+          council.id,
+          req.fullName,
+          req.nickName
+        ).insert map { _ ⇒
+            StatusCodes.OK
+          }
+    }
+  }
+
+  def handleEditMascot(req: EditMascotRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        db.findMascotByID(req.id) flatMap {
+          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case Some(mascot) ⇒
+            if (council.id != mascot.councilId) {
+              Future.successful(StatusCodes.Unauthorized)
+            } else {
+              mascot.copy(fullName = req.fullName, nickName = req.nickName).update map { _ ⇒
+                StatusCodes.OK
+              }
+            }
+        }
+    }
+  }
+
+  def handleDelMascot(req: DelMascotRequest): Future[StatusCode] = {
+    db.findCouncilByToken(req.token) flatMap {
+      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case Some(council) ⇒
+        db.findMascotByID(req.id) flatMap {
+          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case Some(mascot) ⇒
+            if (council.id != mascot.councilId) {
+              Future.successful(StatusCodes.Unauthorized)
+            } else {
+              mascot.delete map { _ ⇒
                 StatusCodes.OK
               }
             }
