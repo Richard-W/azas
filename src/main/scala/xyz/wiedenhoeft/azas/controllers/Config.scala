@@ -16,34 +16,13 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import akka.actor._
-import akka.io.IO
-import akka.pattern.ask
-import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import spray.can.Http
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
+object Config {
+  private val config = ConfigFactory.load()
 
-object Boot extends App {
+  def hasPath = config.hasPath _
 
-  val port = Config.getInt("azas.http.port")
-
-  implicit val system = ActorSystem("azas")
-
-  var db: JDBCDatabase = null
-  try {
-    db = new JDBCDatabase
-    Await.result(db.initializeTables(system.dispatcher), 5.seconds)
-  } catch {
-    case e: Exception ⇒
-      Await.result(system.terminate(), 5.seconds)
-      throw e
-  }
-
-  val service = system.actorOf(RestServiceActor.props(db))
-
-  implicit val timeout = Timeout(5.seconds)
-  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = port)
+  def getString = config.getString _
+  def getInt = config.getInt _
 }

@@ -26,16 +26,15 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class JDBCDatabase extends Database {
 
-  private val config = ConfigFactory.load
-  Class.forName(config.getString("jdbc.driver"))
-  private val url = config.getString("jdbc.url")
-  private val userOption: Option[String] = if (config.hasPath("jdbc.user")) {
-    Some(config.getString("jdbc.user"))
+  Class.forName(Config.getString("azas.jdbc.driver"))
+  private val url = Config.getString("azas.jdbc.url")
+  private val userOption: Option[String] = if (Config.hasPath("azas.jdbc.user")) {
+    Some(Config.getString("azas.jdbc.user"))
   } else {
     None
   }
-  private val passOption: Option[String] = if (config.hasPath("jdbc.pass")) {
-    Some(config.getString("jdbc.pass"))
+  private val passOption: Option[String] = if (Config.hasPath("azas.jdbc.pass")) {
+    Some(Config.getString("azas.jdbc.pass"))
   } else {
     None
   }
