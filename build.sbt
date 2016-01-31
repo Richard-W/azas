@@ -18,11 +18,11 @@ libraryDependencies ++= {
     "io.spray"          %% "spray-httpx"          % sprayVersion,
     "io.spray"          %% "spray-json"           % "1.3.2",
     "mysql"              % "mysql-connector-java" % "5.1.38",
+    "com.h2database"     % "h2"                   % "1.4.191",
     "com.typesafe"       % "config"               % "1.3.0",
     "org.scalatest"     %% "scalatest"            % "2.2.6"       % "test",
     "com.typesafe.akka" %% "akka-testkit"         % akkaVersion   % "test",
-    "io.spray"          %% "spray-testkit"        % sprayVersion  % "test",
-    "com.h2database"     % "h2"                   % "1.4.191"     % "test"
+    "io.spray"          %% "spray-testkit"        % sprayVersion  % "test"
   )
 }
 
