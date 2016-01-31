@@ -83,7 +83,11 @@ trait RestService extends HttpService {
         }
       }
     } ~ path("v1" / "dumpdata") {
-      complete(StatusCodes.NotImplemented)
+      post {
+        entity(as[DumpDataRequest]) { req ⇒
+          complete(handleDumpData(req))
+        }
+      }
     }
 
   def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
@@ -216,6 +220,20 @@ trait RestService extends HttpService {
               }
             }
         }
+    }
+  }
+
+  def handleDumpData(req: DumpDataRequest): Future[Either[StatusCode, DumpDataResponse]] = {
+    if (Config.getString("azas.admin.password") != req.password) {
+      Future.successful(Left(StatusCodes.Unauthorized))
+    } else {
+      db.findAllCouncils flatMap { councils ⇒
+        db.findAllParticipants flatMap { participants ⇒
+          db.findAllMascots map { mascots ⇒
+            Right(DumpDataResponse(councils, participants, mascots))
+          }
+        }
+      }
     }
   }
 }

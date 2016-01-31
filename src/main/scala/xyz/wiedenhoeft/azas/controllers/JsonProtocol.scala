@@ -36,4 +36,6 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val addMascotRequest = jsonFormat3(AddMascotRequest)
   implicit val editMascotRequest = jsonFormat4(EditMascotRequest)
   implicit val delMascotRequest = jsonFormat2(DelMascotRequest)
+  implicit val dumpDataRequest = jsonFormat1(DumpDataRequest)
+  implicit val dumpDataResponse = jsonFormat3(DumpDataResponse)
 }

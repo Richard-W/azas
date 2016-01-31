@@ -175,8 +175,21 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       "Blub"
     ).insert, 5.seconds)
     Post("/v1/delmascot", DelMascotRequest(council.token, inserted.id)) ~> route ~> check {
-      response.status should be(StatusCodes.OK)
+      response.status should be (StatusCodes.OK)
       Await.result(db.findMascotByID(inserted.id), 5.seconds) should be (None)
+    }
+  }
+
+  "Data" should "be dumpable with the right password" in {
+    Post("/v1/dumpdata", DumpDataRequest("testpass")) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
+      responseAs[DumpDataResponse] shouldBe a[DumpDataResponse]
+    }
+  }
+
+  it should "not be dumpable with a wrong password" in {
+    Post("/v1/dumpdata", DumpDataRequest("wrongpass")) ~> route ~> check {
+      response.status should be (StatusCodes.Unauthorized)
     }
   }
 }
