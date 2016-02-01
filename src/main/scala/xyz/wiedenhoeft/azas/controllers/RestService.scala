@@ -33,62 +33,25 @@ trait RestService extends HttpService {
   implicit def executor: ExecutionContext
   implicit def db: Database
 
-  val route =
-    path("v1" / "addpart") {
+  def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T]): Route =
+    path("v1" / name) {
       post {
-        entity(as[AddPartRequest]) { req ⇒
-          complete(handleAddPart(req))
-        }
-      }
-    } ~ path("v1" / "editpart") {
-      post {
-        entity(as[EditPartRequest]) { req ⇒
-          complete(handleEditPart(req))
-        }
-      }
-    } ~ path("v1" / "delpart") {
-      post {
-        entity(as[DelPartRequest]) { req ⇒
-          complete(handleDelPart(req))
-        }
-      }
-    } ~ path("v1" / "addmascot") {
-      post {
-        entity(as[AddMascotRequest]) { req ⇒
-          complete(handleAddMascot(req))
-        }
-      }
-    } ~ path("v1" / "editmascot") {
-      post {
-        entity(as[EditMascotRequest]) { req ⇒
-          complete(handleEditMascot(req))
-        }
-      }
-    } ~ path("v1" / "delmascot") {
-      post {
-        entity(as[DelMascotRequest]) { req ⇒
-          complete(handleDelMascot(req))
-        }
-      }
-    } ~ path("v1" / "getcouncil") {
-      post {
-        entity(as[GetCouncilRequest]) { req ⇒
-          complete(handleGetCouncil(req))
-        }
-      }
-    } ~ path("v1" / "setpriority") {
-      post {
-        entity(as[SetPriorityRequest]) { req ⇒
-          complete(handleSetPriority(req))
-        }
-      }
-    } ~ path("v1" / "dumpdata") {
-      post {
-        entity(as[DumpDataRequest]) { req ⇒
-          complete(handleDumpData(req))
+        entity(as[T]) { req ⇒
+          complete(handler(req))
         }
       }
     }
+
+  val route =
+    apiCall("addpart", handleAddPart) ~
+      apiCall("editpart", handleEditPart) ~
+      apiCall("delpart", handleDelPart) ~
+      apiCall("addmascot", handleAddMascot) ~
+      apiCall("editmascot", handleEditMascot) ~
+      apiCall("delmascot", handleDelMascot) ~
+      apiCall("getcouncil", handleGetCouncil) ~
+      apiCall("setpriority", handleSetPriority) ~
+      apiCall("dumpdata", handleDumpData)
 
   def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
