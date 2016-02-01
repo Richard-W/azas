@@ -36,11 +36,17 @@ trait RestService extends HttpService {
 
   def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T]): Route =
     path("v1" / name) {
-      post {
-        respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+      respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+        post {
           entity(as[T]) { req ⇒
             complete(handler(req))
+          } ~ {
+            respondWithStatus(StatusCodes.BadRequest) {
+              complete("This should be a JSON request")
+            }
           }
+        } ~ {
+          complete("This should be a POST request")
         }
       }
     }
