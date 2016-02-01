@@ -53,7 +53,6 @@ trait RestService extends HttpService {
       apiCall("editmascot", handleEditMascot) ~
       apiCall("delmascot", handleDelMascot) ~
       apiCall("getcouncil", handleGetCouncil) ~
-      apiCall("setpriority", handleSetPriority) ~
       apiCall("dumpdata", handleDumpData) ~
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         complete(StatusCodes.NotFound)
@@ -85,7 +84,7 @@ trait RestService extends HttpService {
             if (participant.councilId != council.id) {
               Future.successful(StatusCodes.Unauthorized)
             } else {
-              participant.copy(info = req.info).update map { _ ⇒
+              participant.copy(priority = req.priority, info = req.info).update map { _ ⇒
                 StatusCodes.OK
               }
             }
@@ -119,24 +118,6 @@ trait RestService extends HttpService {
           db.findMascotsByCouncil(council) map { mascots ⇒
             Right(GetCouncilResponse(council, participants.sortBy(_.priority), mascots))
           }
-        }
-    }
-  }
-
-  def handleSetPriority(req: SetPriorityRequest): Future[StatusCode] = {
-    db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
-      case Some(council) ⇒
-        db.findParticipantByID(req.participantId) flatMap {
-          case None ⇒ Future.successful(StatusCodes.NotFound)
-          case Some(participant) ⇒
-            if (participant.councilId != council.id) {
-              Future.successful(StatusCodes.Unauthorized)
-            } else {
-              participant.copy(priority = req.priority).update map { _ ⇒
-                StatusCodes.OK
-              }
-            }
         }
     }
   }

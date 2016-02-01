@@ -28,11 +28,10 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val mascot = jsonFormat4(Mascot)
 
   implicit val addPartRequest = jsonFormat2(AddPartRequest)
-  implicit val editPartRequest = jsonFormat3(EditPartRequest)
+  implicit val editPartRequest = jsonFormat4(EditPartRequest)
   implicit val delPartRequest = jsonFormat2(DelPartRequest)
   implicit val getCouncilRequest = jsonFormat1(GetCouncilRequest)
   implicit val getCouncilResponse = jsonFormat3(GetCouncilResponse)
-  implicit val setPriorityRequest = jsonFormat3(SetPriorityRequest)
   implicit val addMascotRequest = jsonFormat3(AddMascotRequest)
   implicit val editMascotRequest = jsonFormat4(EditMascotRequest)
   implicit val delMascotRequest = jsonFormat2(DelMascotRequest)

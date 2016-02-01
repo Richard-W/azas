@@ -22,7 +22,7 @@ import spray.testkit._
 import spray.httpx.SprayJsonSupport._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
 import xyz.wiedenhoeft.azas.controllers.RestService
-import xyz.wiedenhoeft.azas.models.{ Mascot, PartInfo }
+import xyz.wiedenhoeft.azas.models.{ Participant, Mascot, PartInfo }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -70,13 +70,20 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   they should "be editable" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
-      Await.result(db.findAllParticipants, 5.seconds).length should be (1)
-    }
+    val inserted = Await.result(Participant(
+      "",
+      "1",
+      0,
+      false,
+      testInfo
+    ).insert, 5.seconds)
 
-    Post("/v1/editpart", EditPartRequest("1", "biel", testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
-      Await.result(db.findParticipantByID("1"), 5.seconds).get.info.firstName should be ("Rudolph")
+    val editInfo = testInfo.copy(firstName = "Rudolph")
+    Post("/v1/editpart", EditPartRequest(inserted.id, "biel", 5, editInfo)) ~> route ~> check {
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
+      val fetched = Await.result(db.findParticipantByID("1"), 5.seconds).get
+      fetched.info should be (editInfo)
+      fetched.priority should be (5)
     }
   }
 
@@ -92,7 +99,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
-    Post("/v1/editpart", EditPartRequest("1", "nonexistant", testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
+    Post("/v1/editpart", EditPartRequest("1", "nonexistant", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
       response.status should be (StatusCodes.Unauthorized)
     }
   }
@@ -102,7 +109,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
-    Post("/v1/editpart", EditPartRequest("1", "jena", testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
+    Post("/v1/editpart", EditPartRequest("1", "jena", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
       response.status should be (StatusCodes.Unauthorized)
     }
   }
@@ -115,20 +122,6 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     Post("/v1/delpart", DelPartRequest("1", "biel")) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       Await.result(db.findAllParticipants, 5.seconds).isEmpty should be (true)
-    }
-  }
-
-  they should "have priorities" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
-      response.status should be(StatusCodes.OK)
-      val inserted = Await.result(db.findAllParticipants, 5.seconds).head
-      inserted.priority should be (0)
-    }
-
-    Post("/v1/setpriority", SetPriorityRequest("biel", "1", 50)) ~> route ~> check {
-      response.status should be(StatusCodes.OK)
-      val inserted = Await.result(db.findAllParticipants, 5.seconds).head
-      inserted.priority should be (50)
     }
   }
 

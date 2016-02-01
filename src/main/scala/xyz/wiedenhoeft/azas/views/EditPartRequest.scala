@@ -21,5 +21,6 @@ import xyz.wiedenhoeft.azas.models.PartInfo
 case class EditPartRequest(
   id: String,
   token: String,
+  priority: Int,
   info: PartInfo
 )
