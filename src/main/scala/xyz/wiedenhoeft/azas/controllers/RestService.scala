@@ -22,27 +22,33 @@ import spray.http._
 import spray.httpx.marshalling._
 import spray.httpx.unmarshalling._
 import spray.httpx.SprayJsonSupport._
+import spray.json._
 
 import JsonProtocol._
 import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
+import scala.util.{ Failure, Success, Try }
 
 trait RestService extends HttpService {
 
   implicit def executor: ExecutionContext
   implicit def db: Database
 
-  def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T]): Route =
+  def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T], format: JsonFormat[T]): Route =
     path("v1" / name) {
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         post {
           entity(as[T]) { req ⇒
             complete(handler(req))
-          } ~ {
-            respondWithStatus(StatusCodes.BadRequest) {
-              complete("This should be a JSON request")
+          } ~ entity(as[String]) { str ⇒
+            Try(str.parseJson.convertTo[T]) match {
+              case Success(req) ⇒ complete(handler(req))
+              case Failure(f) ⇒
+                respondWithStatus(StatusCodes.BadRequest) {
+                  complete("Invalid JSON request: " + f.getMessage)
+                }
             }
           }
         } ~ {
