@@ -16,6 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
+import spray.http.HttpHeaders.RawHeader
 import spray.routing._
 import spray.http._
 import spray.httpx.marshalling._
@@ -36,8 +37,10 @@ trait RestService extends HttpService {
   def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T]): Route =
     path("v1" / name) {
       post {
-        entity(as[T]) { req ⇒
-          complete(handler(req))
+        respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+          entity(as[T]) { req ⇒
+            complete(handler(req))
+          }
         }
       }
     }
