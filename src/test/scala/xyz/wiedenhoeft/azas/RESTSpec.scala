@@ -132,9 +132,9 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
 
     Post("/v1/getcouncil", GetCouncilRequest("biel")) ~> route ~> check {
       response.status should be (StatusCodes.OK)
-      val info = responseAs[GetCouncilResponse]
-      info.council.token should be("biel")
-      info.participants.isEmpty should be(false)
+      val council = responseAs[GetCouncilResponse]
+      council.info.token should be("biel")
+      council.participants.isEmpty should be(false)
     }
   }
 

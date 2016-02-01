@@ -19,7 +19,7 @@ package xyz.wiedenhoeft.azas.views
 import xyz.wiedenhoeft.azas.models.{ Mascot, Participant, Council }
 
 case class GetCouncilResponse(
-  council: Council,
+  info: Council,
   participants: Seq[Participant],
   mascots: Seq[Mascot]
 )
