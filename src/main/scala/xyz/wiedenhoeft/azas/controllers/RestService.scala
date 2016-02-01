@@ -72,7 +72,7 @@ trait RestService extends HttpService {
 
   def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         Participant(
           "",
@@ -88,13 +88,13 @@ trait RestService extends HttpService {
 
   def handleEditPart(req: EditPartRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         db.findParticipantByID(req.id) flatMap {
           case None ⇒ Future.successful(StatusCodes.NotFound)
           case Some(participant) ⇒
             if (participant.councilId != council.id) {
-              Future.successful(StatusCodes.Unauthorized)
+              Future.successful(StatusCodes.Forbidden)
             } else {
               participant.copy(priority = req.priority, info = req.info).update map { _ ⇒
                 StatusCodes.OK
@@ -106,13 +106,13 @@ trait RestService extends HttpService {
 
   def handleDelPart(req: DelPartRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         db.findParticipantByID(req.id) flatMap {
           case None ⇒ Future.successful(StatusCodes.NotFound)
           case Some(participant) ⇒
             if (participant.councilId != council.id) {
-              Future.successful(StatusCodes.Unauthorized)
+              Future.successful(StatusCodes.Forbidden)
             } else {
               participant.delete map { _ ⇒
                 StatusCodes.OK
@@ -124,7 +124,7 @@ trait RestService extends HttpService {
 
   def handleGetCouncil(req: GetCouncilRequest): Future[Either[StatusCode, GetCouncilResponse]] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(Left(StatusCodes.Unauthorized))
+      case None ⇒ Future.successful(Left(StatusCodes.Forbidden))
       case Some(council) ⇒
         db.findParticipantByCouncil(council) flatMap { participants ⇒
           db.findMascotsByCouncil(council) map { mascots ⇒
@@ -136,7 +136,7 @@ trait RestService extends HttpService {
 
   def handleAddMascot(req: AddMascotRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         Mascot(
           "",
@@ -151,13 +151,13 @@ trait RestService extends HttpService {
 
   def handleEditMascot(req: EditMascotRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         db.findMascotByID(req.id) flatMap {
           case None ⇒ Future.successful(StatusCodes.NotFound)
           case Some(mascot) ⇒
             if (council.id != mascot.councilId) {
-              Future.successful(StatusCodes.Unauthorized)
+              Future.successful(StatusCodes.Forbidden)
             } else {
               mascot.copy(fullName = req.fullName, nickName = req.nickName).update map { _ ⇒
                 StatusCodes.OK
@@ -169,13 +169,13 @@ trait RestService extends HttpService {
 
   def handleDelMascot(req: DelMascotRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Unauthorized)
+      case None ⇒ Future.successful(StatusCodes.Forbidden)
       case Some(council) ⇒
         db.findMascotByID(req.id) flatMap {
           case None ⇒ Future.successful(StatusCodes.NotFound)
           case Some(mascot) ⇒
             if (council.id != mascot.councilId) {
-              Future.successful(StatusCodes.Unauthorized)
+              Future.successful(StatusCodes.Forbidden)
             } else {
               mascot.delete map { _ ⇒
                 StatusCodes.OK
@@ -187,7 +187,7 @@ trait RestService extends HttpService {
 
   def handleDumpData(req: DumpDataRequest): Future[Either[StatusCode, DumpDataResponse]] = {
     if (Config.getString("azas.admin.password") != req.password) {
-      Future.successful(Left(StatusCodes.Unauthorized))
+      Future.successful(Left(StatusCodes.Forbidden))
     } else {
       db.findAllCouncils flatMap { councils ⇒
         db.findAllParticipants flatMap { participants ⇒

@@ -89,7 +89,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
 
   they should "not be addable with invalid tokens" in {
     Post("/v1/addpart", AddPartRequest("nonexistant", testInfo)) ~> route ~> check {
-      response.status should be (StatusCodes.Unauthorized)
+      response.status should be (StatusCodes.Forbidden)
       Await.result(db.findAllParticipants, 5.seconds).length should be (0)
     }
   }
@@ -100,7 +100,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     }
 
     Post("/v1/editpart", EditPartRequest("1", "nonexistant", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
-      response.status should be (StatusCodes.Unauthorized)
+      response.status should be (StatusCodes.Forbidden)
     }
   }
 
@@ -110,7 +110,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     }
 
     Post("/v1/editpart", EditPartRequest("1", "jena", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
-      response.status should be (StatusCodes.Unauthorized)
+      response.status should be (StatusCodes.Forbidden)
     }
   }
 
@@ -182,7 +182,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
 
   it should "not be dumpable with a wrong password" in {
     Post("/v1/dumpdata", DumpDataRequest("wrongpass")) ~> route ~> check {
-      response.status should be (StatusCodes.Unauthorized)
+      response.status should be (StatusCodes.Forbidden)
     }
   }
 }
