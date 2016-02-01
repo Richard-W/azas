@@ -27,3 +27,27 @@ $ java -Dconfig.file=/path/to/application.conf -jar azas-<version>.jar
 ```
 
 You should definitely use a reverse proxy to encrypt connections to the service.
+
+To add councils to the database you have to write a json file like this:
+
+```json
+[
+{
+	"uni": "Uni Konstanz",
+	"address": "no clue",
+	"email": "idk",
+	"token": "efgh"
+}, {
+	"uni": "FSU Jena",
+	"address": "Max-Wien-Platz 1",
+	"email": "fsr@paf.uni-jena.de",
+	"token": "abcd"
+}
+]
+```
+
+You can add it with
+
+```sh
+$ java -Ddatabase.seed=/path/to/json/file -jar azas-<version>.jar
+```

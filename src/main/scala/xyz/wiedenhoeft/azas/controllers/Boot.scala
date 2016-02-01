@@ -16,34 +16,64 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
+import java.io.File
+
 import akka.actor._
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
 import spray.can.Http
+import spray.util._
+import xyz.wiedenhoeft.azas.models.Council
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.io.Source
 
 object Boot extends App {
 
   val port = Config.getInt("azas.http.port")
 
   implicit val system = ActorSystem("azas")
+  import system.dispatcher
+  implicit val timeout = Timeout(5.seconds)
 
   var db: JDBCDatabase = null
   try {
     db = new JDBCDatabase
-    Await.result(db.initializeTables(system.dispatcher), 5.seconds)
+    db.initializeTables.await
   } catch {
     case e: Exception ⇒
-      Await.result(system.terminate(), 5.seconds)
+      system.terminate().await
       throw e
+  }
+
+  val dbInit = System.getProperty("database.seed")
+  // Insert a councils into the database
+  if (dbInit != null) {
+    val file = new File(dbInit)
+    if (!file.exists) throw new RuntimeException("database seed file does not exist")
+
+    import spray.json._
+    case class CouncilSeed(uni: String, address: String, email: String, token: String)
+    object JsonFormat extends DefaultJsonProtocol {
+      implicit val councilSeedFormat = jsonFormat4(CouncilSeed)
+    }
+    import JsonFormat._
+
+    val seed = Source.fromFile(file).mkString.parseJson.convertTo[Seq[CouncilSeed]]
+    for (council <- seed) {
+      db.insertCouncil(Council(
+        "",
+        council.uni,
+        council.address,
+        council.email,
+        council.token
+      )).await
+    }
+    System.exit(0)
   }
 
   val service = system.actorOf(RestServiceActor.props(db))
 
-  implicit val timeout = Timeout(5.seconds)
   IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = port)
 }
