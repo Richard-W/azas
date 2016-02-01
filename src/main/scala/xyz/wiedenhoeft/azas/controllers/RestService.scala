@@ -54,7 +54,10 @@ trait RestService extends HttpService {
       apiCall("delmascot", handleDelMascot) ~
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("setpriority", handleSetPriority) ~
-      apiCall("dumpdata", handleDumpData)
+      apiCall("dumpdata", handleDumpData) ~
+      respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+        complete(StatusCodes.NotFound)
+      }
 
   def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
     db.findCouncilByToken(req.token) flatMap {
