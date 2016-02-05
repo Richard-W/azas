@@ -74,6 +74,7 @@ class JDBCDatabase extends Database {
       | cell,
       | gremium,
       | tshirt,
+      | robe,
       | food,
       | allergies,
       | excursion1,
@@ -107,6 +108,7 @@ class JDBCDatabase extends Database {
           resultSet.getString("cell"),
           resultSet.getString("gremium"),
           resultSet.getString("tshirt"),
+          resultSet.getString("robe"),
           resultSet.getString("food"),
           resultSet.getString("allergies"),
           resultSet.getString("excursion1"),
@@ -189,6 +191,7 @@ class JDBCDatabase extends Database {
         | cell,
         | gremium,
         | tshirt,
+        | robe,
         | food,
         | allergies,
         | excursion1,
@@ -202,7 +205,7 @@ class JDBCDatabase extends Database {
         | swimmer,
         | snorer,
         | arrival
-        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       """.stripMargin
     )
     stmt.setInt(1, participant.councilId.toInt)
@@ -215,19 +218,20 @@ class JDBCDatabase extends Database {
     stmt.setString(8, participant.info.cell)
     stmt.setString(9, participant.info.gremium)
     stmt.setString(10, participant.info.tshirt)
-    stmt.setString(11, participant.info.food)
-    stmt.setString(12, participant.info.allergies)
-    stmt.setString(13, participant.info.excursion1)
-    stmt.setString(14, participant.info.excursion2)
-    stmt.setString(15, participant.info.excursion3)
-    stmt.setString(16, participant.info.dayOfBirth)
-    stmt.setString(17, participant.info.nationality)
-    stmt.setString(18, participant.info.address)
-    stmt.setString(19, participant.info.comment)
-    stmt.setInt(20, if (participant.info.zaepfchen) 1 else 0)
-    stmt.setString(21, participant.info.swimmer)
-    stmt.setString(22, participant.info.snorer)
-    stmt.setString(23, participant.info.arrival)
+    stmt.setString(11, participant.info.robe)
+    stmt.setString(12, participant.info.food)
+    stmt.setString(13, participant.info.allergies)
+    stmt.setString(14, participant.info.excursion1)
+    stmt.setString(15, participant.info.excursion2)
+    stmt.setString(16, participant.info.excursion3)
+    stmt.setString(17, participant.info.dayOfBirth)
+    stmt.setString(18, participant.info.nationality)
+    stmt.setString(19, participant.info.address)
+    stmt.setString(20, participant.info.comment)
+    stmt.setInt(21, if (participant.info.zaepfchen) 1 else 0)
+    stmt.setString(22, participant.info.swimmer)
+    stmt.setString(23, participant.info.snorer)
+    stmt.setString(24, participant.info.arrival)
     stmt.executeUpdate()
     val idSet = stmt.getGeneratedKeys
     if (idSet.next()) {
@@ -340,6 +344,7 @@ class JDBCDatabase extends Database {
         | cell TEXT NOT NULL,
         | gremium TEXT NOT NULL,
         | tshirt TEXT NOT NULL,
+        | robe TEXT NOT NULL,
         | food TEXT NOT NULL,
         | allergies TEXT NOT NULL,
         | excursion1 TEXT NOT NULL,

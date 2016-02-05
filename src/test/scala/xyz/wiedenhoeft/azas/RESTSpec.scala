@@ -46,6 +46,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     cell = "3nt3",
     gremium = "stapf",
     tshirt = "m S",
+    robe = "50000€",
     food = "vegan",
     allergies = "alles",
     excursion1 = "AKW",
