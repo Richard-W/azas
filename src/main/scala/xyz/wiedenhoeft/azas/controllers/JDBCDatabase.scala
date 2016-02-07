@@ -16,7 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import java.sql.{ ResultSet, Connection, DriverManager }
+import java.sql.{ Statement, ResultSet, Connection, DriverManager }
 
 import com.typesafe.config.ConfigFactory
 import xyz.wiedenhoeft.azas.models._
@@ -206,7 +206,8 @@ class JDBCDatabase extends Database {
         | snorer,
         | arrival
         |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      """.stripMargin
+      """.stripMargin,
+      Statement.RETURN_GENERATED_KEYS
     )
     stmt.setInt(1, participant.councilId.toInt)
     stmt.setInt(2, participant.priority)
@@ -397,7 +398,8 @@ class JDBCDatabase extends Database {
         | email,
         | token
         |) VALUES (?, ?, ?, ?)
-      """.stripMargin
+      """.stripMargin,
+      Statement.RETURN_GENERATED_KEYS
     )
     stmt.setString(1, council.university)
     stmt.setString(2, council.address)
@@ -420,7 +422,8 @@ class JDBCDatabase extends Database {
         | fullName,
         | nickName
         |) VALUES (?, ?, ?)
-      """.stripMargin
+      """.stripMargin,
+      Statement.RETURN_GENERATED_KEYS
     )
     stmt.setInt(1, mascot.councilId.toInt)
     stmt.setString(2, mascot.fullName)
