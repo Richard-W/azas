@@ -36,15 +36,30 @@ trait RestService extends HttpService {
   implicit def executor: ExecutionContext
   implicit def db: Database
 
-  def apiCall[T](name: String, handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T], format: JsonFormat[T]): Route =
+  class ForbiddenException extends Exception
+  class NotFoundException extends Exception
+
+  /** Way too meta */
+  def apiCall[T, V](name: String, handler: T ⇒ Future[V])(
+    implicit
+    um: FromRequestUnmarshaller[T],
+    format: JsonFormat[T],
+    marshaller: Marshaller[V]
+  ): Route =
     path("v1" / name) {
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         post {
-          entity(as[T]) { req ⇒
-            complete(handler(req))
-          } ~ entity(as[String]) { str ⇒
+          entity(as[String]) { str ⇒
             Try(str.parseJson.convertTo[T]) match {
-              case Success(req) ⇒ complete(handler(req))
+              case Success(req) ⇒
+                implicit def statusMarshaller = spray.httpx.marshalling.ToResponseMarshaller.fromStatusCode
+                complete(handler(req) map[ToResponseMarshallable] { res ⇒
+                  res
+                } recover[ToResponseMarshallable] {
+                  case _: ForbiddenException ⇒ StatusCodes.Forbidden
+                  case _: NotFoundException  ⇒ StatusCodes.NotFound
+                  case _                     ⇒ StatusCodes.InternalServerError
+                })
               case Failure(f) ⇒
                 respondWithStatus(StatusCodes.BadRequest) {
                   complete("Invalid JSON request: " + f.getMessage)
@@ -70,9 +85,9 @@ trait RestService extends HttpService {
         complete(StatusCodes.NotFound)
       }
 
-  def handleAddPart(req: AddPartRequest): Future[StatusCode] = {
+  def handleAddPart(req: AddPartRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         Participant(
           "",
@@ -80,119 +95,119 @@ trait RestService extends HttpService {
           0,
           false,
           req.info
-        ).insert map { _ ⇒
-            StatusCodes.OK
+        ).insert map { inserted ⇒
+            GenericResponse(Some(inserted.id))
           }
     }
   }
 
-  def handleEditPart(req: EditPartRequest): Future[StatusCode] = {
+  def handleEditPart(req: EditPartRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         db.findParticipantByID(req.id) flatMap {
-          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case None ⇒ throw new NotFoundException
           case Some(participant) ⇒
             if (participant.councilId != council.id) {
-              Future.successful(StatusCodes.Forbidden)
+              throw new ForbiddenException
             } else {
               participant.copy(priority = req.priority, info = req.info).update map { _ ⇒
-                StatusCodes.OK
+                GenericResponse()
               }
             }
         }
     }
   }
 
-  def handleDelPart(req: DelPartRequest): Future[StatusCode] = {
+  def handleDelPart(req: DelPartRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         db.findParticipantByID(req.id) flatMap {
-          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case None ⇒ throw new NotFoundException
           case Some(participant) ⇒
             if (participant.councilId != council.id) {
-              Future.successful(StatusCodes.Forbidden)
+              throw new ForbiddenException
             } else {
               participant.delete map { _ ⇒
-                StatusCodes.OK
+                GenericResponse()
               }
             }
         }
     }
   }
 
-  def handleGetCouncil(req: GetCouncilRequest): Future[Either[StatusCode, GetCouncilResponse]] = {
+  def handleGetCouncil(req: GetCouncilRequest): Future[GetCouncilResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(Left(StatusCodes.Forbidden))
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         db.findParticipantByCouncil(council) flatMap { participants ⇒
           db.findMascotsByCouncil(council) map { mascots ⇒
-            Right(GetCouncilResponse(council, participants.sortBy(_.priority), mascots))
+            GetCouncilResponse(council, participants.sortBy(_.priority), mascots)
           }
         }
     }
   }
 
-  def handleAddMascot(req: AddMascotRequest): Future[StatusCode] = {
+  def handleAddMascot(req: AddMascotRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         Mascot(
           "",
           council.id,
           req.fullName,
           req.nickName
-        ).insert map { _ ⇒
-            StatusCodes.OK
+        ).insert map { inserted ⇒
+            GenericResponse(Some(inserted.id))
           }
     }
   }
 
-  def handleEditMascot(req: EditMascotRequest): Future[StatusCode] = {
+  def handleEditMascot(req: EditMascotRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         db.findMascotByID(req.id) flatMap {
-          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case None ⇒ throw new NotFoundException
           case Some(mascot) ⇒
             if (council.id != mascot.councilId) {
-              Future.successful(StatusCodes.Forbidden)
+              throw new ForbiddenException
             } else {
               mascot.copy(fullName = req.fullName, nickName = req.nickName).update map { _ ⇒
-                StatusCodes.OK
+                GenericResponse()
               }
             }
         }
     }
   }
 
-  def handleDelMascot(req: DelMascotRequest): Future[StatusCode] = {
+  def handleDelMascot(req: DelMascotRequest): Future[GenericResponse] = {
     db.findCouncilByToken(req.token) flatMap {
-      case None ⇒ Future.successful(StatusCodes.Forbidden)
+      case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
         db.findMascotByID(req.id) flatMap {
-          case None ⇒ Future.successful(StatusCodes.NotFound)
+          case None ⇒ throw new NotFoundException
           case Some(mascot) ⇒
             if (council.id != mascot.councilId) {
-              Future.successful(StatusCodes.Forbidden)
+              throw new ForbiddenException
             } else {
               mascot.delete map { _ ⇒
-                StatusCodes.OK
+                GenericResponse()
               }
             }
         }
     }
   }
 
-  def handleDumpData(req: DumpDataRequest): Future[Either[StatusCode, DumpDataResponse]] = {
+  def handleDumpData(req: DumpDataRequest): Future[DumpDataResponse] = {
     if (Config.getString("azas.admin.password") != req.password) {
-      Future.successful(Left(StatusCodes.Forbidden))
+      Future.failed(new ForbiddenException)
     } else {
       db.findAllCouncils flatMap { councils ⇒
         db.findAllParticipants flatMap { participants ⇒
           db.findAllMascots map { mascots ⇒
-            Right(DumpDataResponse(councils, participants, mascots))
+            DumpDataResponse(councils, participants, mascots)
           }
         }
       }
