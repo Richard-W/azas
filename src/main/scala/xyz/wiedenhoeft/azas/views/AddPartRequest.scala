@@ -20,5 +20,6 @@ import xyz.wiedenhoeft.azas.models.PartInfo
 
 case class AddPartRequest(
   token: String,
-  info: PartInfo
+  info: PartInfo,
+  priority: Option[Int]
 )

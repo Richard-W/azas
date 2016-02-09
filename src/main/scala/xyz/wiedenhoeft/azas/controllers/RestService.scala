@@ -92,7 +92,7 @@ trait RestService extends HttpService {
         Participant(
           "",
           council.id,
-          0,
+          req.priority.getOrElse(0),
           false,
           req.info
         ).insert map { inserted ⇒

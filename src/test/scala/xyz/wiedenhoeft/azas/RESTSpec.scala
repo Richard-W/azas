@@ -63,7 +63,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   )
 
   "Participants" should "be addable" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       val participant = Await.result(db.findAllParticipants, 5.seconds).head
       participant.info should be (testInfo)
@@ -89,14 +89,14 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   they should "not be addable with invalid tokens" in {
-    Post("/v1/addpart", AddPartRequest("nonexistant", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("nonexistant", testInfo, Some(5))) ~> route ~> check {
       response.status should be (StatusCodes.Forbidden)
       Await.result(db.findAllParticipants, 5.seconds).length should be (0)
     }
   }
 
   they should "not be editable with invalid tokens" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
@@ -106,7 +106,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   they should "not be editable by other councils" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
@@ -116,7 +116,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   they should "be deletable" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
@@ -127,7 +127,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   "Council information" should "be available" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo)) ~> route ~> check {
+    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       response.status should be (StatusCodes.OK)
     }
 
