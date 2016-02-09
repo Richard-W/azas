@@ -66,6 +66,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       val participant = Await.result(db.findAllParticipants, 5.seconds).head
+      participant.priority should be (5)
       participant.info should be (testInfo)
     }
   }
