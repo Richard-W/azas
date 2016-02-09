@@ -24,7 +24,7 @@ case class PartInfo(
   cell: String,
   gremium: String,
   tshirt: String,
-  robe: String,
+  robe: Boolean,
   food: String,
   allergies: String,
   excursion1: String,
