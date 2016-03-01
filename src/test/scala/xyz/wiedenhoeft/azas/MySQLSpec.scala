@@ -72,7 +72,8 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     zaepfchen = false,
     swimmer = "Ja",
     snorer = "Motorsäge",
-    arrival = "garnicht, da nichtexistent"
+    arrival = "garnicht, da nichtexistent",
+    owntent = true
   )
 
   "Participants" should "be insertable" in {

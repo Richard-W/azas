@@ -37,5 +37,6 @@ case class PartInfo(
   zaepfchen: Boolean,
   swimmer: String,
   snorer: String,
-  arrival: String
+  arrival: String,
+  owntent: Boolean
 )

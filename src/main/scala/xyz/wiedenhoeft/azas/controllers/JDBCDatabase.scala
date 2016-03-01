@@ -18,7 +18,6 @@ package xyz.wiedenhoeft.azas.controllers
 
 import java.sql.{ Statement, ResultSet, Connection, DriverManager }
 
-import com.typesafe.config.ConfigFactory
 import xyz.wiedenhoeft.azas.models._
 
 import scala.annotation.tailrec
@@ -87,7 +86,8 @@ class JDBCDatabase extends Database {
       | zaepfchen,
       | swimmer,
       | snorer,
-      | arrival
+      | arrival,
+      | owntent
       |FROM participants WHERE """.stripMargin + where
     )
     for (i <- params.indices) {
@@ -121,7 +121,8 @@ class JDBCDatabase extends Database {
           if (resultSet.getInt("zaepfchen") == 1) true else false,
           resultSet.getString("swimmer"),
           resultSet.getString("snorer"),
-          resultSet.getString("arrival")
+          resultSet.getString("arrival"),
+          if (resultSet.getInt("owntent") == 1) true else false
         )
       )
     }
@@ -204,8 +205,9 @@ class JDBCDatabase extends Database {
         | zaepfchen,
         | swimmer,
         | snorer,
-        | arrival
-        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        | arrival,
+        | owntent
+        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       """.stripMargin,
       Statement.RETURN_GENERATED_KEYS
     )
@@ -233,6 +235,7 @@ class JDBCDatabase extends Database {
     stmt.setString(22, participant.info.swimmer)
     stmt.setString(23, participant.info.snorer)
     stmt.setString(24, participant.info.arrival)
+    stmt.setInt(25, if (participant.info.owntent) 1 else 0)
     stmt.executeUpdate()
     val idSet = stmt.getGeneratedKeys
     if (idSet.next()) {
@@ -291,7 +294,8 @@ class JDBCDatabase extends Database {
         | zaepfchen = ?,
         | swimmer = ?,
         | snorer = ?,
-        | arrival = ?
+        | arrival = ?,
+        | owntent = ?
         |WHERE id = ?
       """.stripMargin
     )
@@ -319,7 +323,8 @@ class JDBCDatabase extends Database {
     stmt.setString(22, participant.info.swimmer)
     stmt.setString(23, participant.info.snorer)
     stmt.setString(24, participant.info.arrival)
-    stmt.setString(25, participant.id)
+    stmt.setInt(25, if (participant.info.owntent) 1 else 0)
+    stmt.setString(26, participant.id)
     stmt.executeUpdate()
     participant
   }
@@ -360,7 +365,8 @@ class JDBCDatabase extends Database {
         | zaepfchen INT NOT NULL,
         | swimmer TEXT NOT NULL,
         | snorer TEXT NOT NULL,
-        | arrival TEXT NOT NULL
+        | arrival TEXT NOT NULL,
+        | owntent INT NOT NULL
         |)
       """.stripMargin
     )
