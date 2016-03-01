@@ -23,10 +23,14 @@ object RestServiceActor {
   def props(db: Database) = Props(classOf[RestServiceActor], db)
 }
 
-class RestServiceActor(implicit val db: Database) extends Actor with RestService {
+class RestServiceActor(implicit val db: Database) extends Actor with RestService with ActorLogging {
 
   implicit val routingSettings = RoutingSettings.default
   implicit val exceptionHandler = ExceptionHandler.default
+
+  override def logException(e: Exception): Unit = {
+    log.error(e, e.getMessage)
+  }
 
   override def receive: Receive = runRoute(route)
 
