@@ -116,7 +116,7 @@ class JDBCDatabase extends Database {
           resultSet.getString("excursion3"),
           resultSet.getString("dayOfBirth"),
           resultSet.getString("nationality"),
-          resultSet.getString("address"),
+          Address.fromString(resultSet.getString("address")),
           resultSet.getString("comment"),
           if (resultSet.getInt("zaepfchen") == 1) true else false,
           resultSet.getString("swimmer"),
@@ -229,7 +229,7 @@ class JDBCDatabase extends Database {
     stmt.setString(16, participant.info.excursion3)
     stmt.setString(17, participant.info.dayOfBirth)
     stmt.setString(18, participant.info.nationality)
-    stmt.setString(19, participant.info.address)
+    stmt.setString(19, participant.info.address.stringify())
     stmt.setString(20, participant.info.comment)
     stmt.setInt(21, if (participant.info.zaepfchen) 1 else 0)
     stmt.setString(22, participant.info.swimmer)
@@ -317,7 +317,7 @@ class JDBCDatabase extends Database {
     stmt.setString(16, participant.info.excursion3)
     stmt.setString(17, participant.info.dayOfBirth)
     stmt.setString(18, participant.info.nationality)
-    stmt.setString(19, participant.info.address)
+    stmt.setString(19, participant.info.address.stringify())
     stmt.setString(20, participant.info.comment)
     stmt.setString(21, if (participant.info.zaepfchen) "1" else "0")
     stmt.setString(22, participant.info.swimmer)

@@ -16,27 +16,29 @@
  */
 package xyz.wiedenhoeft.azas.models
 
-case class PartInfo(
-  firstName: String,
-  lastName: String,
-  nickName: String,
-  email: String,
-  cell: String,
-  gremium: String,
-  tshirt: String,
-  robe: Boolean,
-  food: String,
-  allergies: String,
-  excursion1: String,
-  excursion2: String,
-  excursion3: String,
-  dayOfBirth: String,
-  nationality: String,
-  address: Address,
-  comment: String,
-  zaepfchen: Boolean,
-  swimmer: String,
-  snorer: String,
-  arrival: String,
-  owntent: Boolean
-)
+case class Address(
+    street: String,
+    zipCode: String,
+    city: String,
+    country: String
+) {
+  def stringify(): String = {
+    def escape(str: String): String = {
+      str.replace(',', '.')
+    }
+    escape(street) + ", " + escape(zipCode) + ", " + escape(city) + ", " + escape(country)
+  }
+}
+
+object Address extends ((String, String, String, String) ⇒ Address) {
+  def fromString(addressString: String): Address = {
+    val split = addressString.split(", ")
+    if (split.length != 4) throw new Exception("Address invalid")
+    Address(
+      split(0),
+      split(1),
+      split(2),
+      split(3)
+    )
+  }
+}

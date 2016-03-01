@@ -17,7 +17,7 @@
 package xyz.wiedenhoeft.azas
 
 import org.scalatest._
-import xyz.wiedenhoeft.azas.models.{ Mascot, PartInfo, Council, Participant }
+import xyz.wiedenhoeft.azas.models._
 
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -67,7 +67,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     excursion3 = "AKW",
     dayOfBirth = "30.02.86",
     nationality = "deutsch",
-    address = "nope",
+    address = Address("bla", "blub", "foo", "Oz"),
     comment = "Enteenteente",
     zaepfchen = false,
     swimmer = "Ja",

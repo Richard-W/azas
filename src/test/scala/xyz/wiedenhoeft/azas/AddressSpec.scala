@@ -14,29 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.models
+package xyz.wiedenhoeft.azas
 
-case class PartInfo(
-  firstName: String,
-  lastName: String,
-  nickName: String,
-  email: String,
-  cell: String,
-  gremium: String,
-  tshirt: String,
-  robe: Boolean,
-  food: String,
-  allergies: String,
-  excursion1: String,
-  excursion2: String,
-  excursion3: String,
-  dayOfBirth: String,
-  nationality: String,
-  address: Address,
-  comment: String,
-  zaepfchen: Boolean,
-  swimmer: String,
-  snorer: String,
-  arrival: String,
-  owntent: Boolean
-)
+import org.scalatest._
+import xyz.wiedenhoeft.azas.models.Address
+
+class AddressSpec extends FlatSpec with Matchers {
+
+  "An address" must "be convertable to a string" in {
+    val addr = Address("Hans-Wurst-Allee 13", "1337", "Leetstadt", "Oz")
+    Address.fromString(addr.stringify()) should be (addr)
+  }
+}

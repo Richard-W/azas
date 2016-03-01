@@ -22,7 +22,7 @@ import spray.testkit._
 import spray.httpx.SprayJsonSupport._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
 import xyz.wiedenhoeft.azas.controllers.RestService
-import xyz.wiedenhoeft.azas.models.{ Participant, Mascot, PartInfo }
+import xyz.wiedenhoeft.azas.models.{ Address, Participant, Mascot, PartInfo }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -54,7 +54,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     excursion3 = "AKW",
     dayOfBirth = "30.02.86",
     nationality = "deutsch",
-    address = "nope",
+    address = Address("bla", "blub", "foo", "Oz"),
     comment = "Enteenteente",
     zaepfchen = false,
     swimmer = "Ja",
