@@ -34,7 +34,7 @@ object Address extends ((String, String, String, String) ⇒ Address) {
   def fromString(addressString: String): Address = {
     val split = addressString.split(", ")
     if (split.length != 4) {
-      Address("","","","")
+      Address("", "", "", "")
     } else {
       Address(
         split(0),
