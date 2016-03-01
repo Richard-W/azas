@@ -33,12 +33,15 @@ case class Address(
 object Address extends ((String, String, String, String) ⇒ Address) {
   def fromString(addressString: String): Address = {
     val split = addressString.split(", ")
-    if (split.length != 4) throw new Exception("Address invalid")
-    Address(
-      split(0),
-      split(1),
-      split(2),
-      split(3)
-    )
+    if (split.length != 4) {
+      Address("","","","")
+    } else {
+      Address(
+        split(0),
+        split(1),
+        split(2),
+        split(3)
+      )
+    }
   }
 }
