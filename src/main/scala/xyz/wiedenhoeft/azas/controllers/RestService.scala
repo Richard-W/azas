@@ -16,6 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
+import akka.event.Logging
 import spray.http.HttpHeaders.RawHeader
 import spray.routing._
 import spray.http._
@@ -39,6 +40,8 @@ trait RestService extends HttpService {
   class ForbiddenException extends Exception
   class NotFoundException extends Exception
 
+  def logException(e: Exception): Unit = {}
+
   /** Way too meta */
   def apiCall[T, V](name: String, handler: T ⇒ Future[V])(
     implicit
@@ -58,7 +61,9 @@ trait RestService extends HttpService {
                 } recover[ToResponseMarshallable] {
                   case _: ForbiddenException ⇒ StatusCodes.Forbidden
                   case _: NotFoundException  ⇒ StatusCodes.NotFound
-                  case _                     ⇒ StatusCodes.InternalServerError
+                  case e: Exception                      ⇒
+                    logException(e)
+                    StatusCodes.InternalServerError
                 })
               case Failure(f) ⇒
                 respondWithStatus(StatusCodes.BadRequest) {
