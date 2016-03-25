@@ -25,4 +25,8 @@ object Config {
 
   def getString = config.getString _
   def getInt = config.getInt _
+  def getBool = config.getBoolean _
+
+  def allowAdd = !hasPath("azas.api.allowAdd") || getBool("azas.api.allowAdd")
+  def allowEdit = !hasPath("azas.api.allowEdit") || getBool("azas.api.allowEdit")
 }

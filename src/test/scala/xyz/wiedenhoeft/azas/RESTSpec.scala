@@ -83,6 +83,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
 
     val editInfo = testInfo.copy(firstName = "Rudolph")
     Post("/v1/editpart", EditPartRequest(inserted.id, "biel", 5, editInfo)) ~> route ~> check {
+      response.status should be (StatusCodes.OK)
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
       val fetched = Await.result(db.findParticipantByID("1"), 5.seconds).get
       fetched.info should be (editInfo)
@@ -129,15 +130,10 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   }
 
   "Council information" should "be available" in {
-    Post("/v1/addpart", AddPartRequest("biel", testInfo, Some(5))) ~> route ~> check {
-      response.status should be (StatusCodes.OK)
-    }
-
     Post("/v1/getcouncil", GetCouncilRequest("biel")) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       val council = responseAs[GetCouncilResponse]
       council.info.token should be("biel")
-      council.participants.isEmpty should be(false)
     }
   }
 
