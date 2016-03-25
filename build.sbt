@@ -2,7 +2,7 @@ name := "azas"
 
 organization := "xyz.wiedenhoeft"
 
-version := "1.1-SNAPSHOT"
+version := "1.2-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
