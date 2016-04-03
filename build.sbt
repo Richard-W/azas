@@ -4,7 +4,7 @@ organization := "xyz.wiedenhoeft"
 
 version := "1.2-SNAPSHOT"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 libraryDependencies ++= {
   val akkaVersion = "2.4.2"
