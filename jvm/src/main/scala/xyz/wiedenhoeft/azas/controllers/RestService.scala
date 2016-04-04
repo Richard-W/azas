@@ -86,6 +86,14 @@ trait RestService extends HttpService {
       apiCall("delmascot", handleDelMascot) ~
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
+      get {
+        path("azas.js") {
+          compressResponse()(getFromResource("azas-opt.js"))
+        } ~
+        path("") {
+          compressResponse()(getFromResource("index.html"))
+        }
+      }
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         complete(StatusCodes.NotFound)
       }
