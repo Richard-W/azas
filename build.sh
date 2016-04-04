@@ -24,13 +24,13 @@ rm -rf ${builddir}/sbt
 tar --directory ${builddir} -xzf ${sbt_archive_path}
 
 # Remove old artifacts
-rm -f ${dir}/target/scala-2.11/azas-assembly*
+rm -f ${dir}/jvm/target/scala-2.11/azas-assembly*
 
 cd ${dir}
 ${builddir}/sbt/bin/sbt assembly
 cd -
 
-artifact_name=`ls ${dir}/target/scala-2.11/ | grep azas-assembly`
-artifact_path="${dir}/target/scala-2.11/${artifact_name}"
+artifact_name=`ls ${dir}/jvm/target/scala-2.11/ | grep azas-assembly`
+artifact_path="${dir}/jvm/target/scala-2.11/${artifact_name}"
 artifact_destname=`echo ${artifact_name} | sed -e 's/\-assembly//'`
 cp ${artifact_path} ${dir}/${artifact_destname}
