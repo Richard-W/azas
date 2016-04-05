@@ -11,13 +11,13 @@ class Client(url: String) {
 
   @JSExport
   def addParticipant(token: String, participant: js.Object, priority: Int): Observable = {
-    val request = js.Dynamic.literal("token" -> token, "participant" -> participant, "priority" -> priority)
+    val request = js.Dynamic.literal("token" -> token, "info" -> participant, "priority" -> priority)
     DOM.post(url + "/v1/addpart", JSON.stringify(request))
   }
 
   @JSExport
   def editParticipant(token: String, participant: js.Object, priority: Int, id: String): Observable = {
-    val request = js.Dynamic.literal("token" -> token, "participant" -> participant, "priority" -> priority, "id" -> id)
+    val request = js.Dynamic.literal("token" -> token, "info" -> participant, "priority" -> priority, "id" -> id)
     DOM.post(url + "/v1/editpart", JSON.stringify(request))
   }
 

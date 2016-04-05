@@ -16,12 +16,13 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import java.sql.{ Statement, ResultSet, Connection, DriverManager }
+import java.sql.{ Connection, DriverManager, ResultSet, Statement }
 
+import spray.json._
 import xyz.wiedenhoeft.azas.models._
 
 import scala.annotation.tailrec
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{ ExecutionContext, Future }
 
 class JDBCDatabase extends Database {
 
@@ -66,28 +67,7 @@ class JDBCDatabase extends Database {
       | councilId,
       | priority,
       | approved,
-      | firstName,
-      | lastName,
-      | nickName,
-      | email,
-      | cell,
-      | gremium,
-      | tshirt,
-      | robe,
-      | food,
-      | allergies,
-      | excursion1,
-      | excursion2,
-      | excursion3,
-      | dayOfBirth,
-      | nationality,
-      | address,
-      | comment,
-      | zaepfchen,
-      | swimmer,
-      | snorer,
-      | arrival,
-      | owntent
+      | info
       |FROM participants WHERE """.stripMargin + where
     )
     for (i <- params.indices) {
@@ -100,30 +80,7 @@ class JDBCDatabase extends Database {
         resultSet.getInt("councilId").toString,
         resultSet.getInt("priority"),
         if (resultSet.getInt("approved") == 1) true else false,
-        PartInfo(
-          resultSet.getString("firstName"),
-          resultSet.getString("lastName"),
-          resultSet.getString("nickName"),
-          resultSet.getString("email"),
-          resultSet.getString("cell"),
-          resultSet.getString("gremium"),
-          resultSet.getString("tshirt"),
-          if (resultSet.getInt("robe") == 1) true else false,
-          resultSet.getString("food"),
-          resultSet.getString("allergies"),
-          resultSet.getString("excursion1"),
-          resultSet.getString("excursion2"),
-          resultSet.getString("excursion3"),
-          resultSet.getString("dayOfBirth"),
-          resultSet.getString("nationality"),
-          Address.fromString(resultSet.getString("address")),
-          resultSet.getString("comment"),
-          if (resultSet.getInt("zaepfchen") == 1) true else false,
-          resultSet.getString("swimmer"),
-          resultSet.getString("snorer"),
-          resultSet.getString("arrival"),
-          if (resultSet.getInt("owntent") == 1) true else false
-        )
+        resultSet.getString("info").parseJson.asJsObject
       )
     }
   }
@@ -185,57 +142,15 @@ class JDBCDatabase extends Database {
         | councilId,
         | priority,
         | approved,
-        | firstName,
-        | lastName,
-        | nickName,
-        | email,
-        | cell,
-        | gremium,
-        | tshirt,
-        | robe,
-        | food,
-        | allergies,
-        | excursion1,
-        | excursion2,
-        | excursion3,
-        | dayOfBirth,
-        | nationality,
-        | address,
-        | comment,
-        | zaepfchen,
-        | swimmer,
-        | snorer,
-        | arrival,
-        | owntent
-        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        | info
+        |) VALUES (?, ?, ?, ?)
       """.stripMargin,
       Statement.RETURN_GENERATED_KEYS
     )
     stmt.setInt(1, participant.councilId.toInt)
     stmt.setInt(2, participant.priority)
     stmt.setInt(3, if (participant.approved) 1 else 0)
-    stmt.setString(4, participant.info.firstName)
-    stmt.setString(5, participant.info.lastName)
-    stmt.setString(6, participant.info.nickName)
-    stmt.setString(7, participant.info.email)
-    stmt.setString(8, participant.info.cell)
-    stmt.setString(9, participant.info.gremium)
-    stmt.setString(10, participant.info.tshirt)
-    stmt.setInt(11, if (participant.info.robe) 1 else 0)
-    stmt.setString(12, participant.info.food)
-    stmt.setString(13, participant.info.allergies)
-    stmt.setString(14, participant.info.excursion1)
-    stmt.setString(15, participant.info.excursion2)
-    stmt.setString(16, participant.info.excursion3)
-    stmt.setString(17, participant.info.dayOfBirth)
-    stmt.setString(18, participant.info.nationality)
-    stmt.setString(19, participant.info.address.stringify())
-    stmt.setString(20, participant.info.comment)
-    stmt.setInt(21, if (participant.info.zaepfchen) 1 else 0)
-    stmt.setString(22, participant.info.swimmer)
-    stmt.setString(23, participant.info.snorer)
-    stmt.setString(24, participant.info.arrival)
-    stmt.setInt(25, if (participant.info.owntent) 1 else 0)
+    stmt.setString(4, participant.info.compactPrint)
     stmt.executeUpdate()
     val idSet = stmt.getGeneratedKeys
     if (idSet.next()) {
@@ -274,57 +189,15 @@ class JDBCDatabase extends Database {
         | councilId = ?,
         | priority = ?,
         | approved = ?,
-        | firstName = ?,
-        | lastName = ?,
-        | nickName = ?,
-        | email = ?,
-        | cell = ?,
-        | gremium = ?,
-        | tshirt = ?,
-        | robe = ?,
-        | food = ?,
-        | allergies = ?,
-        | excursion1 = ?,
-        | excursion2 = ?,
-        | excursion3 = ?,
-        | dayOfBirth = ?,
-        | nationality = ?,
-        | address = ?,
-        | comment = ?,
-        | zaepfchen = ?,
-        | swimmer = ?,
-        | snorer = ?,
-        | arrival = ?,
-        | owntent = ?
+        | info = ?
         |WHERE id = ?
       """.stripMargin
     )
     stmt.setString(1, participant.councilId)
     stmt.setInt(2, participant.priority)
     stmt.setString(3, if (participant.approved) "1" else "0")
-    stmt.setString(4, participant.info.firstName)
-    stmt.setString(5, participant.info.lastName)
-    stmt.setString(6, participant.info.nickName)
-    stmt.setString(7, participant.info.email)
-    stmt.setString(8, participant.info.cell)
-    stmt.setString(9, participant.info.gremium)
-    stmt.setString(10, participant.info.tshirt)
-    stmt.setInt(11, if (participant.info.robe) 1 else 0)
-    stmt.setString(12, participant.info.food)
-    stmt.setString(13, participant.info.allergies)
-    stmt.setString(14, participant.info.excursion1)
-    stmt.setString(15, participant.info.excursion2)
-    stmt.setString(16, participant.info.excursion3)
-    stmt.setString(17, participant.info.dayOfBirth)
-    stmt.setString(18, participant.info.nationality)
-    stmt.setString(19, participant.info.address.stringify())
-    stmt.setString(20, participant.info.comment)
-    stmt.setString(21, if (participant.info.zaepfchen) "1" else "0")
-    stmt.setString(22, participant.info.swimmer)
-    stmt.setString(23, participant.info.snorer)
-    stmt.setString(24, participant.info.arrival)
-    stmt.setInt(25, if (participant.info.owntent) 1 else 0)
-    stmt.setString(26, participant.id)
+    stmt.setString(4, participant.info.compactPrint)
+    stmt.setString(5, participant.id)
     stmt.executeUpdate()
     participant
   }
@@ -345,28 +218,7 @@ class JDBCDatabase extends Database {
         | councilId INT NOT NULL,
         | priority INT NOT NULL,
         | approved INT NOT NULL,
-        | firstName TEXT NOT NULL,
-        | lastName TEXT NOT NULL,
-        | nickName TEXT NOT NULL,
-        | email TEXT NOT NULL,
-        | cell TEXT NOT NULL,
-        | gremium TEXT NOT NULL,
-        | tshirt TEXT NOT NULL,
-        | robe INT NOT NULL,
-        | food TEXT NOT NULL,
-        | allergies TEXT NOT NULL,
-        | excursion1 TEXT NOT NULL,
-        | excursion2 TEXT NOT NULL,
-        | excursion3 TEXT NOT NULL,
-        | dayOfBirth TEXT NOT NULL,
-        | nationality TEXT NOT NULL,
-        | address TEXT NOT NULL,
-        | comment TEXT NOT NULL,
-        | zaepfchen INT NOT NULL,
-        | swimmer TEXT NOT NULL,
-        | snorer TEXT NOT NULL,
-        | arrival TEXT NOT NULL,
-        | owntent INT NOT NULL
+        | info TEXT NOT NULL
         |)
       """.stripMargin
     )

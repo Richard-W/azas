@@ -16,10 +16,10 @@
  */
 package xyz.wiedenhoeft.azas.views
 
-import xyz.wiedenhoeft.azas.models.PartInfo
+import spray.json.JsObject
 
 case class AddPartRequest(
   token: String,
-  info: PartInfo,
+  info: JsObject,
   priority: Option[Int]
 )

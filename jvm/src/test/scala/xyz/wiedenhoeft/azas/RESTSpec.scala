@@ -20,9 +20,10 @@ import org.scalatest._
 import spray.http._
 import spray.testkit._
 import spray.httpx.SprayJsonSupport._
+import spray.json._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
 import xyz.wiedenhoeft.azas.controllers.RestService
-import xyz.wiedenhoeft.azas.models.{ Address, Participant, Mascot, PartInfo }
+import xyz.wiedenhoeft.azas.models.{ Address, Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -38,29 +39,9 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
     db.reset
   }
 
-  val testInfo = PartInfo(
-    firstName = "Ralf",
-    lastName = "Ralfinson",
-    nickName = "Ente",
-    email = "ente@example.org",
-    cell = "3nt3",
-    gremium = "stapf",
-    tshirt = "m S",
-    robe = true,
-    food = "vegan",
-    allergies = "alles",
-    excursion1 = "AKW",
-    excursion2 = "AKW",
-    excursion3 = "AKW",
-    dayOfBirth = "30.02.86",
-    nationality = "deutsch",
-    address = Address("bla", "blub", "foo", "Oz"),
-    comment = "Enteenteente",
-    zaepfchen = false,
-    swimmer = "Ja",
-    snorer = "Motorsäge",
-    arrival = "garnicht, da nichtexistent",
-    owntent = true
+  val testInfo = JsObject(
+    "name" -> JsString("Testity test"),
+    "email" -> JsString("testity@example.org")
   )
 
   "Participants" should "be addable" in {
@@ -81,7 +62,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       testInfo
     ).insert, 5.seconds)
 
-    val editInfo = testInfo.copy(firstName = "Rudolph")
+    val editInfo = testInfo.copy(fields = testInfo.fields + ("name" -> JsString("Testity2")))
     Post("/v1/editpart", EditPartRequest(inserted.id, "biel", 5, editInfo)) ~> route ~> check {
       response.status should be (StatusCodes.OK)
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
@@ -103,7 +84,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
-    Post("/v1/editpart", EditPartRequest("1", "nonexistant", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
+    Post("/v1/editpart", EditPartRequest("1", "nonexistant", 0, testInfo.copy(fields = testInfo.fields + ("name" -> JsString("Rudolph"))))) ~> route ~> check {
       response.status should be (StatusCodes.Forbidden)
     }
   }
@@ -113,7 +94,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
       Await.result(db.findAllParticipants, 5.seconds).length should be (1)
     }
 
-    Post("/v1/editpart", EditPartRequest("1", "jena", 0, testInfo.copy(firstName = "Rudolph"))) ~> route ~> check {
+    Post("/v1/editpart", EditPartRequest("1", "jena", 0, testInfo.copy(fields = testInfo.fields + ("name" -> JsString("Rudolph"))))) ~> route ~> check {
       response.status should be (StatusCodes.Forbidden)
     }
   }

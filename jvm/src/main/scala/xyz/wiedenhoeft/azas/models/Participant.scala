@@ -16,6 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.models
 
+import spray.json.JsObject
 import xyz.wiedenhoeft.azas.controllers.Database
 
 import scala.concurrent.ExecutionContext
@@ -25,7 +26,7 @@ case class Participant(
     councilId: String,
     priority: Int,
     approved: Boolean,
-    info: PartInfo
+    info: JsObject
 ) {
 
   def insert(implicit executor: ExecutionContext, db: Database) = db.insertParticipant(this)

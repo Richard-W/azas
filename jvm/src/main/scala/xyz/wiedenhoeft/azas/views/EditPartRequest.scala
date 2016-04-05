@@ -16,11 +16,11 @@
  */
 package xyz.wiedenhoeft.azas.views
 
-import xyz.wiedenhoeft.azas.models.PartInfo
+import spray.json.JsObject
 
 case class EditPartRequest(
   id: String,
   token: String,
   priority: Int,
-  info: PartInfo
+  info: JsObject
 )

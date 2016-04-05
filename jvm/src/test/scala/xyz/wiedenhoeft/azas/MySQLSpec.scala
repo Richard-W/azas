@@ -17,12 +17,12 @@
 package xyz.wiedenhoeft.azas
 
 import org.scalatest._
+import spray.json._
 import xyz.wiedenhoeft.azas.models._
 
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import xyz.wiedenhoeft.azas.controllers.JDBCDatabase
 
 class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
@@ -51,29 +51,9 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     "jena"
   ).insert, 5.seconds).id
 
-  val testInfo = PartInfo(
-    firstName = "Ralf",
-    lastName = "Ralfinson",
-    nickName = "Ente",
-    email = "ente@example.org",
-    cell = "3nt3",
-    gremium = "stapf",
-    tshirt = "m S",
-    robe = true,
-    food = "vegan",
-    allergies = "alles",
-    excursion1 = "AKW",
-    excursion2 = "AKW",
-    excursion3 = "AKW",
-    dayOfBirth = "30.02.86",
-    nationality = "deutsch",
-    address = Address("bla", "blub", "foo", "Oz"),
-    comment = "Enteenteente",
-    zaepfchen = false,
-    swimmer = "Ja",
-    snorer = "Motorsäge",
-    arrival = "garnicht, da nichtexistent",
-    owntent = true
+  val testInfo = JsObject(
+    "name" -> JsString("Testity Test"),
+    "email" -> JsString("testity@example.org")
   )
 
   "Participants" should "be insertable" in {
@@ -96,7 +76,7 @@ class MySQLSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       false,
       testInfo
     ).insert, 5.seconds)
-    val updated = inserted.copy(info = testInfo.copy(firstName = "Rudolph"))
+    val updated = inserted.copy(info = testInfo.copy(fields = testInfo.fields + ("name" -> JsString("Rudolph"))))
     Await.result(updated.update, 5.seconds)
     val fetched = Await.result(db.findParticipantByID(updated.id), 5.seconds).get
     fetched should be (updated)
