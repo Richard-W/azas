@@ -23,7 +23,7 @@ import spray.httpx.SprayJsonSupport._
 import spray.json._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
 import xyz.wiedenhoeft.azas.controllers.RestService
-import xyz.wiedenhoeft.azas.models.{ Address, Mascot, Participant }
+import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
 
 import scala.concurrent._
@@ -163,6 +163,16 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   it should "not be dumpable with a wrong password" in {
     Post("/v1/dumpdata", DumpDataRequest("wrongpass")) ~> route ~> check {
       response.status should be (StatusCodes.Forbidden)
+    }
+  }
+
+  "Invalid participant requests" should "fail" in {
+    Post("/v1/addpart", AddPartRequest("biel", JsObject("invalid" -> JsString("value")), Some(5))) ~> route ~> check {
+      response.status should be (StatusCodes.BadRequest)
+    }
+
+    Post("/v1/editpart", EditPartRequest("1", "biel", 0, JsObject("invalid" -> JsString("value")))) ~> route ~> check {
+      response.status should be (StatusCodes.BadRequest)
     }
   }
 }
