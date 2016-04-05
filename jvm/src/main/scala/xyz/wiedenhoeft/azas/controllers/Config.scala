@@ -16,7 +16,9 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ ConfigFactory, ConfigObject, ConfigRenderOptions }
+
+import scala.collection.JavaConversions._
 
 object Config {
   private val config = ConfigFactory.load()
@@ -27,6 +29,19 @@ object Config {
   def getInt = config.getInt _
   def getBool = config.getBoolean _
 
-  def allowAdd = !hasPath("azas.api.allowAdd") || getBool("azas.api.allowAdd")
-  def allowEdit = !hasPath("azas.api.allowEdit") || getBool("azas.api.allowEdit")
+  lazy val allowAdd = !hasPath("azas.api.allowAdd") || getBool("azas.api.allowAdd")
+  lazy val allowEdit = !hasPath("azas.api.allowEdit") || getBool("azas.api.allowEdit")
+
+  lazy val types: Map[String, Map[String, String]] = {
+    def helper(ty: ConfigObject): Map[String, String] =
+      (ty.keySet map { key ⇒
+        (key, ty.get(key).render().replace("\"", ""))
+      }).toSeq.toMap
+
+    val types = config.getObject("azas.scheme.types")
+    (types.keySet map { key ⇒
+      (key, helper(config.getObject("azas.scheme.types." + key)))
+    }).toSeq.toMap
+  }
+  lazy val participantType = config.getString("azas.scheme.participantType")
 }
