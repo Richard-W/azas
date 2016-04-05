@@ -39,8 +39,11 @@ trait RestService extends HttpService {
 
   class ForbiddenException extends Exception
   class NotFoundException extends Exception
+  class BadRequestException extends Exception
 
   def logException(e: Exception): Unit = {}
+
+  lazy val partValidator = Validator.get(Config.participantType)
 
   /** Way too meta */
   def apiCall[T, V](name: String, handler: T ⇒ Future[V])(
@@ -60,8 +63,9 @@ trait RestService extends HttpService {
                   res
                 } recover[ToResponseMarshallable] {
                   case _: ForbiddenException ⇒ StatusCodes.Forbidden
-                  case _: NotFoundException  ⇒ StatusCodes.NotFound
-                  case e: Exception                      ⇒
+                  case _: NotFoundException ⇒ StatusCodes.NotFound
+                  case _: BadRequestException ⇒ StatusCodes.BadRequest
+                  case e: Exception ⇒
                     logException(e)
                     StatusCodes.InternalServerError
                 })
@@ -103,6 +107,7 @@ trait RestService extends HttpService {
 
   def handleAddPart(req: AddPartRequest): Future[GenericResponse] = {
     if (!Config.allowAdd) return Future.failed(new ForbiddenException)
+    if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -120,6 +125,7 @@ trait RestService extends HttpService {
 
   def handleEditPart(req: EditPartRequest): Future[GenericResponse] = {
     if (!Config.allowEdit) return Future.failed(new ForbiddenException)
+    if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
