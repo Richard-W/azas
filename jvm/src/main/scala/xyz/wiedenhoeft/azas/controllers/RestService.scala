@@ -87,7 +87,7 @@ trait RestService extends HttpService {
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
       get {
-        path("azas.js") {
+        path("js" / "azas" / "azas.min.js") {
           compressResponse()(getFromResource("azas-opt.js"))
         } ~
         path("") {
