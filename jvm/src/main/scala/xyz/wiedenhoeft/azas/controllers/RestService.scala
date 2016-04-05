@@ -90,6 +90,9 @@ trait RestService extends HttpService {
         path("js" / "azas" / "azas.min.js") {
           compressResponse()(getFromResource("azas-opt.js"))
         } ~
+        pathPrefix("js") {
+          compressResponse()(getFromResourceDirectory("META-INF/resources/webjars/"))
+        } ~
         path("") {
           compressResponse()(getFromResource("index.html"))
         }

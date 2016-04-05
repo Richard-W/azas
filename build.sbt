@@ -41,7 +41,10 @@ lazy val azasJVM = azas.jvm
         "com.typesafe"       % "config"               % "1.3.0",
         "org.scalatest"     %% "scalatest"            % "2.2.6"       % "test",
         "com.typesafe.akka" %% "akka-testkit"         % akkaVersion   % "test",
-        "io.spray"          %% "spray-testkit"        % sprayVersion  % "test"
+        "io.spray"          %% "spray-testkit"        % sprayVersion  % "test",
+
+        "org.webjars.bower"  % "rxjs"                 % "4.0.6",
+        "org.webjars.bower"  % "rxjs-html"            % "6.0.0"
       )
     },
     mainClass in Compile := Some("xyz.wiedenhoeft.azas.controllers.Boot"),
