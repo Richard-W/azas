@@ -30,7 +30,7 @@ cd ${dir}
 ${builddir}/sbt/bin/sbt assembly
 cd -
 
-artifact_name=`ls ${dir}/jvm/target/scala-2.11/ | grep azas-assembly`
-artifact_path="${dir}/jvm/target/scala-2.11/${artifact_name}"
+artifact_name=`ls ${dir}/target/scala-2.11/ | grep azas-assembly`
+artifact_path="${dir}/target/scala-2.11/${artifact_name}"
 artifact_destname=`echo ${artifact_name} | sed -e 's/\-assembly//'`
 cp ${artifact_path} ${dir}/${artifact_destname}
