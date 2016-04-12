@@ -91,14 +91,14 @@ trait RestService extends HttpService {
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
       get {
-        path("js" / "azas" / "azas.min.js") {
-          compressResponse()(getFromResource("azas-opt.js"))
+        pathPrefix("modules" / "azas") {
+          getFromResourceDirectory("META-INF/resources/webjars/azas/" + Config.projectVersion + "/app")
         } ~
-        pathPrefix("js") {
-          compressResponse()(getFromResourceDirectory("META-INF/resources/webjars/"))
+        pathPrefix("modules") {
+          getFromResourceDirectory("webjars")
         } ~
         path("") {
-          compressResponse()(getFromResource("index.html"))
+          getFromResource("html/index.html")
         }
       }
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {

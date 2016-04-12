@@ -29,6 +29,8 @@ object Config {
   def getInt = config.getInt _
   def getBool = config.getBoolean _
 
+  lazy val projectVersion = getClass.getPackage.getImplementationVersion
+
   lazy val allowAdd = !hasPath("azas.api.allowAdd") || getBool("azas.api.allowAdd")
   lazy val allowEdit = !hasPath("azas.api.allowEdit") || getBool("azas.api.allowEdit")
 
