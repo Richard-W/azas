@@ -14,8 +14,10 @@ System.config({
     'baseURL': 'modules/',
     'defaultJSExtensions': true
 });
-System.import('azas/main')
-    .then(null, console.error.bind(console));
+System.import('azas/main').then(function(module) {
+    module.azasBootstrap('http://localhost:8080');
+}, console.error.bind(console));
+
 </script>
 <azas>Loading...</azas>
 </body>
