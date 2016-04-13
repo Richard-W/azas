@@ -18,4 +18,8 @@ export class AzasService {
     public getCouncil(token: string): Observable<Object> {
         return this.call('/v1/getcouncil', {'token': token});
     }
+
+    public addParticipant(token: string, info: any, priority: number) {
+        return this.call('/v1/addpart', {'token': token, 'info': info, 'priority': priority});
+    }
 }

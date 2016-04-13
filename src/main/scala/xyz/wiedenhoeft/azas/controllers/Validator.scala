@@ -44,14 +44,16 @@ object Validator {
       new Validator {
         override def validate(v: JsValue): Boolean = v match {
           case obj: JsObject ⇒
-            for (field <- obj.fields.keys) {
-              validationMap.get(field) match {
-                case Some(validator) ⇒
-                  if (!validator.validate(obj.fields(field))) return false
-                case None ⇒ return false
-              }
+            validationMap foreach {
+              case (name, validator) ⇒
+                obj.fields.get(name) match {
+                  case Some(value) ⇒
+                    if (!validator.validate(value)) return false
+                  case None ⇒
+                    return false
+                }
             }
-            return true
+            true
           case _ ⇒ false
         }
       }

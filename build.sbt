@@ -47,4 +47,12 @@ mainClass in Compile := Some("xyz.wiedenhoeft.azas.controllers.Boot")
 
 resolveFromWebjarsNodeModulesDir := true
 
-unmanagedResourceDirectories in Compile += (nodeModuleDirectory in Assets).value
+val moduleMappings = taskKey[Seq[(File, String)]]("Mappings")
+
+moduleMappings := {
+  val base = (webJarsNodeModulesDirectory in Assets).value
+  val files = (nodeModules in Assets).value
+  files pair Path.rebase(base, "modules")
+}
+
+mappings in (Compile, packageBin) <++= moduleMappings
