@@ -95,7 +95,7 @@ trait RestService extends HttpService {
           getFromResourceDirectory("META-INF/resources/webjars/azas/" + Config.projectVersion + "/app")
         } ~
         pathPrefix("modules") {
-          getFromResourceDirectory("webjars")
+          getFromResourceDirectory("modules")
         } ~
         path("") {
           getFromResource("html/index.html")
