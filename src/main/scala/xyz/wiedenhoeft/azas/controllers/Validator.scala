@@ -53,7 +53,7 @@ object Validator {
                     return false
                 }
             }
-            true
+            obj.fields.size == validationMap.size
           case _ ⇒ false
         }
       }
