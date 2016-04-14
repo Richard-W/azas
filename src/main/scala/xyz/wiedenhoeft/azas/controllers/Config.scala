@@ -16,7 +16,7 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import com.typesafe.config.{ ConfigFactory, ConfigObject, ConfigRenderOptions }
+import com.typesafe.config.{ ConfigFactory, ConfigObject }
 
 import scala.collection.JavaConversions._
 
@@ -46,4 +46,11 @@ object Config {
     }).toSeq.toMap
   }
   lazy val participantType = config.getString("azas.scheme.participantType")
+
+  lazy val enums: Map[String, Seq[String]] = {
+    val enums = config.getObject("azas.scheme.enums")
+    (enums.keySet map { key ⇒
+      (key, config.getStringList("azas.scheme.enums." + key).toSeq)
+    }).toSeq.toMap
+  }
 }

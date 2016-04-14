@@ -22,7 +22,20 @@ class ValidationSpec extends FlatSpec with Matchers {
       )
     )
 
+    val obj3 = JsObject(
+      "str" -> JsString("foo"),
+      "e" -> JsString("1")
+    )
+
+    val obj4 = JsObject(
+      "str" -> JsString("foo"),
+      "e" -> JsString("3")
+    )
+
     validator.validate(obj1) should be (true)
     validator.validate(obj2) should be (false)
+
+    Validator.get("ContainsEnum").validate(obj3) should be (true)
+    Validator.get("ContainsEnum").validate(obj4) should be (false)
   }
 }

@@ -30,11 +30,8 @@ object Validator {
 
   def get(ty: String): Validator = {
     if (builtinValidators.contains(ty)) builtinValidators(ty)
-    else {
-      val typeMap = Config.types.get(ty) match {
-        case Some(s) ⇒ s
-        case None    ⇒ throw new Exception("Unknown validation type: " + ty)
-      }
+    else if (Config.types.contains(ty)) {
+      val typeMap = Config.types(ty)
       val neededValidators: Map[String, Validator] = (for (sub <- typeMap.values.toSeq.distinct) yield {
         (sub, Validator.get(sub))
       }).toMap
@@ -57,6 +54,17 @@ object Validator {
           case _ ⇒ false
         }
       }
+    } else if (Config.enums.contains(ty)) {
+      val enum = Config.enums(ty)
+      new Validator {
+        override def validate(v: JsValue): Boolean = v match {
+          case JsString(str) ⇒
+            enum.contains(str)
+          case _ ⇒ false
+        }
+      }
+    } else {
+      throw new Exception("Unknown type/enum: " + ty)
     }
   }
 }
