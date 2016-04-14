@@ -60,7 +60,7 @@ export class CouncilComponent implements OnInit {
             'email': 'testity@example.org',
             'address': {
                 'street': 'a',
-                //'zipCode': '0',
+                'zipCode': '0',
                 'city': 'b',
                 'country': 'c'
             }
