@@ -56,3 +56,16 @@ moduleMappings := {
 }
 
 mappings in (Compile, packageBin) <++= moduleMappings
+
+assembledMappings in assembly <+= moduleMappings map { mappings ⇒ sbtassembly.MappingSet(None, mappings.toVector) }
+
+val modulesPattern = "^modules.*".r
+
+assemblyMergeStrategy in assembly := { path ⇒
+  if (path.startsWith("modules")) {
+    MergeStrategy.first
+  } else {
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(path)
+  }
+}
