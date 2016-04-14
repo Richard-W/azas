@@ -91,9 +91,6 @@ trait RestService extends HttpService {
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
       get {
-        pathPrefix("modules" / "azas") {
-          getFromResourceDirectory("META-INF/resources/webjars/azas/" + Config.projectVersion + "/app")
-        } ~
         pathPrefix("modules") {
           getFromResourceDirectory("modules")
         } ~

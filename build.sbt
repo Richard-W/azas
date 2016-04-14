@@ -55,6 +55,12 @@ moduleMappings := {
   files pair Path.rebase(base, "modules")
 }
 
+moduleMappings ++= {
+  val base = target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app"
+  val files = typescript.value
+  files pair Path.rebase(base, (file("modules") / "azas").getPath)
+}
+
 mappings in (Compile, packageBin) <++= moduleMappings
 
 assembledMappings in assembly <+= moduleMappings map { mappings ⇒ sbtassembly.MappingSet(None, mappings.toVector) }
@@ -62,6 +68,8 @@ assembledMappings in assembly <+= moduleMappings map { mappings ⇒ sbtassembly.
 assemblyMergeStrategy in assembly := { path ⇒
   if (path.startsWith("modules")) {
     MergeStrategy.first
+  } else if (path.startsWith("META-INF/resources/webjars")) {
+    MergeStrategy.discard
   } else {
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(path)
