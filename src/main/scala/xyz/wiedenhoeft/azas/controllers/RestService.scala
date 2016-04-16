@@ -91,16 +91,12 @@ trait RestService extends HttpService {
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
       get {
-        pathPrefix("modules") {
-          getFromResourceDirectory("modules")
-        } ~
-        pathPrefix("css") {
-          getFromResourceDirectory("css")
-        } ~
         path("") {
-          getFromResource("html/index.html")
+          getFromResource("public/index.html")
+        } ~ {
+          getFromResourceDirectory("public")
         }
-      }
+      } ~
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         complete(StatusCodes.NotFound)
       }
