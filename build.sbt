@@ -43,7 +43,7 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
  * be retrieved either from the web or your local cache.
  */
 libraryDependencies ++= {
-  val akkaVersion = "2.4.3"
+  val akkaVersion = "2.4.4"
   val sprayVersion = "1.3.3"
 
   Seq(
@@ -53,7 +53,7 @@ libraryDependencies ++= {
     "io.spray"          %% "spray-http"           % sprayVersion,
     "io.spray"          %% "spray-httpx"          % sprayVersion,
     "io.spray"          %% "spray-json"           % "1.3.2",
-    "mysql"              % "mysql-connector-java" % "5.1.38",
+    "mysql"              % "mysql-connector-java" % "6.0.2",
     "com.h2database"     % "h2"                   % "1.4.191",
     "com.typesafe"       % "config"               % "1.3.0",
     "org.scalatest"     %% "scalatest"            % "2.2.6"       % "test",
@@ -62,7 +62,7 @@ libraryDependencies ++= {
 
     "org.webjars.npm"    % "systemjs"             % "0.19.26",
     "org.webjars.npm"    % "rxjs"                 % "5.0.0-beta.5",
-    "org.webjars.npm"    % "angular2"             % "2.0.0-beta.14"
+    "org.webjars.npm"    % "angular2"             % "2.0.0-beta.15"
   )
 }
 
