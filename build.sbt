@@ -48,6 +48,7 @@ resolveFromWebjarsNodeModulesDir := true
 val copyModules = taskKey[Seq[File]]("Module files for runtime")
 
 copyModules := {
+  streams.value.log.info("Regenerating modules in managed resources")
   val targetDirs = (managedResourceDirectories in Compile).value
   val copy = {
     val base = (webJarsNodeModulesDirectory in Assets).value
@@ -63,7 +64,7 @@ copyModules := {
         (source, targetDir / relativeDest)
       }
   }
-  IO.copy(copy)
+  IO.copy(copy, overwrite = true)
   copy map { case (_, dest) ⇒ dest }
 }
 
