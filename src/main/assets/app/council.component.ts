@@ -63,7 +63,8 @@ export class CouncilComponent implements OnInit {
                 'zipCode': '0',
                 'city': 'b',
                 'country': 'c'
-            }
+            },
+            'excursion': 'Option 1'
         }, 5).subscribe(
             response => {
                 this.reloadCouncil();
