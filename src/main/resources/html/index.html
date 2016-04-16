@@ -5,20 +5,36 @@
     <meta charset="utf-8" />
 </head>
 <body>
-<script src="/modules/es6-shim/es6-shim.min.js"></script>
-<script src="/modules/systemjs/dist/system-polyfills.js"></script>
+<!-- Load polyfills -->
 <script src="/modules/angular2/bundles/angular2-polyfills.min.js"></script>
+<script src="/modules/systemjs/dist/system-polyfills.js"></script>
+
+<!-- Configure module loader -->
 <script src="/modules/systemjs/dist/system.js"></script>
 <script>
 System.config({
-    'baseURL': 'modules/',
-    'defaultJSExtensions': true
+    baseURL: 'modules',
+    defaultJSExtensions: true,
+    packages: {
+        azas: {
+            format: 'register',
+        }
+    }
 });
+</script>
+
+<!-- Load deps -->
+<script src="/modules/rxjs/bundles/Rx.min.js"></script>
+<script src="/modules/angular2/bundles/angular2.dev.js"></script>
+<script src="/modules/angular2/bundles/http.min.js"></script>
+
+<!-- Load app -->
+<script>
 System.import('azas/main').then(function(module) {
     module.azasBootstrap('http://localhost:8080');
 }, console.error.bind(console));
-
 </script>
+
 <azas>Loading...</azas>
 </body>
 </html>
