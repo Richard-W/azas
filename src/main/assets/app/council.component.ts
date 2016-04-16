@@ -20,6 +20,7 @@ import {AzasService} from './azas.service';
                     <tr *ngFor="#participant of council.participants">
                         <td>{{participant.info.name}}</td>
                         <td>{{participant.info.email}}</td>
+                        <td><button (click)="deleteParticipant(participant.id)">Delete</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -47,6 +48,17 @@ export class CouncilComponent implements OnInit {
             council => {
                 this.council = council;
                 this.councilString = JSON.stringify(council);
+            },
+            error => {
+                this.error = JSON.stringify(error);
+            }
+        );
+    }
+
+    private deleteParticipant(id: string) {
+        this.azas.deleteParticipant(this.token, id).subscribe(
+            success => {
+                this.reloadCouncil();
             },
             error => {
                 this.error = JSON.stringify(error);

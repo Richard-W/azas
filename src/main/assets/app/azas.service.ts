@@ -22,4 +22,8 @@ export class AzasService {
     public addParticipant(token: string, info: any, priority: number) {
         return this.call('/v1/addpart', {'token': token, 'info': info, 'priority': priority});
     }
+
+    public deleteParticipant(token: string, id: string) {
+        return this.call('/v1/delpart', {'token': token, 'id': id});
+    }
 }
