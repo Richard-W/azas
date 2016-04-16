@@ -45,23 +45,29 @@ mainClass in Compile := Some("xyz.wiedenhoeft.azas.controllers.Boot")
 
 resolveFromWebjarsNodeModulesDir := true
 
-val moduleMappings = taskKey[Seq[(File, String)]]("Mappings")
+val copyModules = taskKey[Seq[File]]("Module files for runtime")
 
-moduleMappings := {
-  val base = (webJarsNodeModulesDirectory in Assets).value
-  val files = (nodeModules in Assets).value
-  files pair Path.rebase(base, "modules")
+copyModules := {
+  val targetDirs = (managedResourceDirectories in Compile).value
+  val copy = {
+    val base = (webJarsNodeModulesDirectory in Assets).value
+    val files = (nodeModules in Assets).value
+    files pair Path.rebase(base, "modules")
+  } ++ {
+    val base = target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app"
+    val files = typescript.value
+    files pair Path.rebase(base, (file("modules") / "azas").getPath)
+  } flatMap {
+    case (source, relativeDest) ⇒
+      targetDirs map { targetDir ⇒
+        (source, targetDir / relativeDest)
+      }
+  }
+  IO.copy(copy)
+  copy map { case (_, dest) ⇒ dest }
 }
 
-moduleMappings ++= {
-  val base = target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app"
-  val files = typescript.value
-  files pair Path.rebase(base, (file("modules") / "azas").getPath)
-}
-
-mappings in (Compile, packageBin) <++= moduleMappings
-
-assembledMappings in assembly <+= moduleMappings map { mappings ⇒ sbtassembly.MappingSet(None, mappings.toVector) }
+(resourceGenerators in Compile) <+= copyModules
 
 assemblyMergeStrategy in assembly := { path ⇒
   if (path.startsWith("modules")) {
