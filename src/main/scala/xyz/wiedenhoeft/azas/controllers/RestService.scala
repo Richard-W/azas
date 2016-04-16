@@ -94,6 +94,9 @@ trait RestService extends HttpService {
         pathPrefix("modules") {
           getFromResourceDirectory("modules")
         } ~
+        pathPrefix("css") {
+          getFromResourceDirectory("css")
+        } ~
         path("") {
           getFromResource("html/index.html")
         }

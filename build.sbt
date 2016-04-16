@@ -1,6 +1,7 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 import WebKeys._
+import LessKeys._
 
 lazy val azas = (project in file("."))
   .enablePlugins(SbtWeb)
@@ -87,6 +88,11 @@ copyModules := {
     val base = target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app"
     val files = typescript.value
     files pair Path.rebase(base, (file("modules") / "azas").getPath)
+  } ++ {
+    /* Map the stylesheets that are built using less */
+    val base = target.value / "web" / "less" / "main" / "style"
+    val files = (less in Assets).value
+    files pair Path.rebase(base, file("css").getPath)
   } flatMap {
     /* Make the relative paths absolute */
     case (source, relativeDest) ⇒
