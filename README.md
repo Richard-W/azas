@@ -27,8 +27,7 @@ $ ./build.sh
 ```
 
 This command is everything it takes to build a functioning version of
-azas. There are however some dependencies which are likely already
-installed on your system:
+azas. There are however some dependencies:
 
  * Java 8 (Java 7 may or may not work. Don't find out during production)
  * wget

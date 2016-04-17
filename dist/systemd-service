@@ -1,0 +1,12 @@
+[Unit]
+Description=AZaS service
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/azas
+ExecStart=/usr/bin/java -Dconfig.file=${AZAS_CONFIG} -jar /usr/lib/azas.jar
+User=azas
+
+[Install]
+WantedBy=multi-user.target
+

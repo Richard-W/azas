@@ -1,10 +1,16 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+
 import scalariform.formatter.preferences._
 import WebKeys._
 import LessKeys._
+import com.typesafe.sbt.packager.linux.{LinuxFileMetaData, LinuxPackageMapping}
 
 lazy val azas = (project in file("."))
-  .enablePlugins(SbtWeb)
+  .enablePlugins(
+    SbtWeb,
+    LinuxPlugin,
+    RpmPlugin
+  )
 
 name := "azas"
 
@@ -131,3 +137,62 @@ assemblyMergeStrategy in assembly := { path ⇒
     oldStrategy(path)
   }
 }
+
+/* Native packager settings */
+
+linuxPackageMappings += LinuxPackageMapping(Seq(
+  (assembly.value, "/usr/lib/azas.jar"),
+  (baseDirectory.value / "dist" / "systemd-config", "/etc/sysconfig/azas"),
+  (baseDirectory.value / "dist" / "systemd-service", "/usr/lib/systemd/system/azas.service")
+), fileData = LinuxFileMetaData(permissions = "644", user = "root"))
+
+linuxPackageMappings += LinuxPackageMapping(Seq(
+  (baseDirectory.value / "example.conf", "/etc/azas.conf")
+), fileData = LinuxFileMetaData(permissions = "640", user = "azas"))
+
+linuxPackageMappings += LinuxPackageMapping(Seq(
+  (baseDirectory.value / "dist" / "azas-launcher.sh", "/usr/bin/azas")
+), fileData = LinuxFileMetaData(permissions = "755", user = "root"))
+
+/* RPM specific settings */
+
+rpmVendor := "generic"
+
+version in Rpm := {
+  if (version.value.endsWith("-SNAPSHOT")) version.value.split("\\-").head
+  else version.value
+}
+
+rpmPre := Some("""
+  |if [ $1 == 1 ]; then
+  |  groupadd -g 126119 azas
+  |  useradd -r -d /var/lib/azas -m -u 126119 -g 126119 azas
+  |  chown -R azas:azas /var/lib/azas
+  |  chmod -R 750 /var/lib/azas
+  |fi
+""".stripMargin)
+
+rpmPost := Some("""
+  |if [ $1 == 2 ]; then
+  |  systemctl try-restart azas
+  |fi
+  |systemctl daemon-reload
+""".stripMargin)
+
+rpmPreun := Some("""
+  |if [ $1 == 0 ]; then
+  |  systemctl stop azas
+  |fi
+""".stripMargin)
+
+rpmPostun := Some("""
+  |if [ $1 == 0 ]; then
+  |  userdel azas
+  |  rm -rf /var/lib/azas
+  |  systemctl daemon-reload
+  |fi
+""".stripMargin)
+
+rpmLicense := Some("AGPLv3")
+
+linuxPackageMappings in Rpm := linuxPackageMappings.value
