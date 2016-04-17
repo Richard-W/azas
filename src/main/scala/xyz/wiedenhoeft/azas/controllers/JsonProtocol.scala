@@ -23,7 +23,6 @@ import xyz.wiedenhoeft.azas.views.v1._
 
 object JsonProtocol extends DefaultJsonProtocol {
 
-  implicit val address = jsonFormat4(Address)
   implicit val council = jsonFormat5(Council)
   implicit val participant = jsonFormat5(Participant)
   implicit val mascot = jsonFormat4(Mascot)
