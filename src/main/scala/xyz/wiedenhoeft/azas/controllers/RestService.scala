@@ -24,13 +24,13 @@ import spray.httpx.marshalling._
 import spray.httpx.unmarshalling._
 import spray.httpx.SprayJsonSupport._
 import spray.json._
-
 import JsonProtocol._
-import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
+import xyz.wiedenhoeft.azas.models.{Mascot, Participant}
 import xyz.wiedenhoeft.azas.views._
+import xyz.wiedenhoeft.azas.views.v1._
 
 import scala.concurrent._
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 trait RestService extends HttpService {
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.views
+package xyz.wiedenhoeft.azas.views.v1
 
 case class GetCouncilRequest(
   token: String

@@ -25,6 +25,7 @@ import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
 import xyz.wiedenhoeft.azas.controllers.RestService
 import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
+import xyz.wiedenhoeft.azas.views.v1._
 
 import scala.concurrent._
 import scala.concurrent.duration._

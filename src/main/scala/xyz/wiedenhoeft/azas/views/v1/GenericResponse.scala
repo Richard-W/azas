@@ -14,12 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package xyz.wiedenhoeft.azas.views
+package xyz.wiedenhoeft.azas.views.v1
 
-import xyz.wiedenhoeft.azas.models.{ Mascot, Participant, Council }
-
-case class GetCouncilResponse(
-  info: Council,
-  participants: Seq[Participant],
-  mascots: Seq[Mascot]
+case class GenericResponse(
+  id: Option[String] = None
 )

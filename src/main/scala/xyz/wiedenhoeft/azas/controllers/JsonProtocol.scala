@@ -19,6 +19,7 @@ package xyz.wiedenhoeft.azas.controllers
 import spray.json._
 import xyz.wiedenhoeft.azas.models._
 import xyz.wiedenhoeft.azas.views._
+import xyz.wiedenhoeft.azas.views.v1._
 
 object JsonProtocol extends DefaultJsonProtocol {
 
