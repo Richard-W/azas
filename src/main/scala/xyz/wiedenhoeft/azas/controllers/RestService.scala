@@ -67,9 +67,9 @@ trait RestService extends HttpService {
                 val response: ToResponseMarshallable = handler(req) map { res ⇒
                   toResponse(res)
                 } recover {
-                  case _: ForbiddenException  ⇒ toResponse(StatusCodes.Forbidden)
-                  case _: NotFoundException   ⇒ toResponse(StatusCodes.NotFound)
-                  case _: BadRequestException ⇒ toResponse(StatusCodes.BadRequest)
+                  case e: ForbiddenException  ⇒ toResponse(StatusCodes.Forbidden)
+                  case e: NotFoundException   ⇒ toResponse(StatusCodes.NotFound)
+                  case e: BadRequestException ⇒ toResponse(StatusCodes.BadRequest)
                   case e: Exception ⇒
                     logException(e)
                     toResponse(StatusCodes.InternalServerError)

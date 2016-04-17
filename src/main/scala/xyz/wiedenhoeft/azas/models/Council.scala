@@ -20,6 +20,9 @@ import xyz.wiedenhoeft.azas.controllers.Database
 
 import scala.concurrent.{ Future, ExecutionContext }
 
+/**
+ * Database representation of a council
+ */
 case class Council(
     id: String,
     university: String,

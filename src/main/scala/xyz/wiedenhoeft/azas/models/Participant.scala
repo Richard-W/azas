@@ -21,6 +21,9 @@ import xyz.wiedenhoeft.azas.controllers.Database
 
 import scala.concurrent.ExecutionContext
 
+/**
+ * Database representation of a participant
+ */
 case class Participant(
     id: String,
     councilId: String,
@@ -28,10 +31,7 @@ case class Participant(
     approved: Boolean,
     info: JsObject
 ) {
-
   def insert(implicit executor: ExecutionContext, db: Database) = db.insertParticipant(this)
-
   def update(implicit executor: ExecutionContext, db: Database) = db.updateParticipant(this)
-
   def delete(implicit executor: ExecutionContext, db: Database) = db.deleteParticipant(this)
 }

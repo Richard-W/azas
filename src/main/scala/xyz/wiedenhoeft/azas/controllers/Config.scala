@@ -20,6 +20,9 @@ import com.typesafe.config._
 
 import scala.collection.JavaConversions._
 
+/**
+ * Singleton object that provides easy access to configuration parameters
+ */
 object Config {
   private lazy val config = ConfigFactory.load().getConfig("azas")
 

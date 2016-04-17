@@ -21,6 +21,9 @@ import xyz.wiedenhoeft.azas.models._
 import xyz.wiedenhoeft.azas.views._
 import xyz.wiedenhoeft.azas.views.v1._
 
+/**
+ * Collection of type classes for easy conversion to and from JSON
+ */
 object JsonProtocol extends DefaultJsonProtocol {
 
   implicit val council = jsonFormat5(Council)

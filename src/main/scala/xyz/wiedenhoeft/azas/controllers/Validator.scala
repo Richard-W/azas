@@ -2,6 +2,9 @@ package xyz.wiedenhoeft.azas.controllers
 
 import spray.json._
 
+/**
+ * Validates JSON values against a scheme
+ */
 sealed trait Validator {
   def validate(obj: JsValue): Boolean
 }
@@ -10,6 +13,9 @@ object Validator {
 
   private val config = Config.scheme
 
+  /**
+   * The validator implementation that is used to validate the info field of participant requests
+   */
   lazy val participantValidator = get(config.participantType)
 
   private val builtinValidators = Map[String, Validator] (
@@ -33,6 +39,12 @@ object Validator {
     }
   )
 
+  /**
+   * Initialize a validator for a given type that is specified in the configuration
+   *
+   * @param ty Name of the type
+   * @return A validator for the type
+   */
   def get(ty: String): Validator = {
     if (builtinValidators.contains(ty)) builtinValidators(ty)
     else if (config.types.contains(ty)) {

@@ -30,6 +30,11 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.{ Failure, Success, Try }
 
+/**
+ * Main application
+ *
+ * Initializes the actor system and sets up database connections
+ */
 object Boot extends App {
 
   println("Starting up AZaS")

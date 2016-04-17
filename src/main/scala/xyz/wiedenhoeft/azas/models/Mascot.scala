@@ -20,6 +20,9 @@ import xyz.wiedenhoeft.azas.controllers.Database
 
 import scala.concurrent.ExecutionContext
 
+/**
+ * Database representation of a mascot
+ */
 case class Mascot(
     id: String,
     councilId: String,

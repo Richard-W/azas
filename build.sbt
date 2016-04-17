@@ -90,7 +90,7 @@ copyModules := {
     files pair Path.rebase(base, file("public") / "modules" / "azas")
   } ++ {
     /* Map the stylesheets that are built using less */
-    val base = target.value / "web" / "less" / "main" / "style"
+    val base = target.value / "web" / "less" / "main" / "css"
     val files = (less in Assets).value
     files pair Path.rebase(base, file("public") / "css")
   } ++ {

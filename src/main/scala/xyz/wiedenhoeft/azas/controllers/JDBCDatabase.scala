@@ -24,6 +24,11 @@ import xyz.wiedenhoeft.azas.models._
 import scala.annotation.tailrec
 import scala.concurrent.{ ExecutionContext, Future }
 
+/**
+ * JDBC implementation of Database
+ *
+ * May only work with MySQL and H2 (MySQL flavor)
+ */
 class JDBCDatabase extends Database {
 
   private val config = Config.database.jdbc

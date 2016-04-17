@@ -20,6 +20,9 @@ import xyz.wiedenhoeft.azas.models._
 
 import scala.concurrent._
 
+/**
+ * Implementation agnostic abstraction layer for the database
+ */
 trait Database {
 
   def insertParticipant(participant: Participant)(implicit executor: ExecutionContext): Future[Participant]
@@ -55,4 +58,9 @@ trait Database {
   def findMascotsByCouncil(council: Council)(implicit executor: ExecutionContext): Future[Seq[Mascot]]
 }
 
+/**
+ * Thrown when the database fails
+ *
+ * @param message The specific error message
+ */
 class DatabaseException(message: String) extends Exception(message)
