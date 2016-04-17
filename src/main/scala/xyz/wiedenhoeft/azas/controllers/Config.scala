@@ -16,41 +16,124 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import com.typesafe.config.{ ConfigFactory, ConfigObject }
+import com.typesafe.config._
 
 import scala.collection.JavaConversions._
 
 object Config {
-  private val config = ConfigFactory.load()
+  private lazy val config = ConfigFactory.load().getConfig("azas")
 
-  def hasPath = config.hasPath _
-
-  def getString = config.getString _
-  def getInt = config.getInt _
-  def getBool = config.getBoolean _
-
+  /**
+   * Version of this project
+   */
   lazy val projectVersion = getClass.getPackage.getImplementationVersion
 
-  lazy val allowAdd = !hasPath("azas.api.allowAdd") || getBool("azas.api.allowAdd")
-  lazy val allowEdit = !hasPath("azas.api.allowEdit") || getBool("azas.api.allowEdit")
+  /**
+   * Values regulating database access
+   */
+  object database {
+    private lazy val config = Config.config.getConfig("database")
 
-  lazy val types: Map[String, Map[String, String]] = {
-    def helper(ty: ConfigObject): Map[String, String] =
-      (ty.keySet map { key ⇒
-        (key, ty.get(key).render().replace("\"", ""))
-      }).toSeq.toMap
+    /**
+     * Database driver
+     */
+    lazy val driver = config.getString("driver")
 
-    val types = config.getObject("azas.scheme.types")
-    (types.keySet map { key ⇒
-      (key, helper(config.getObject("azas.scheme.types." + key)))
-    }).toSeq.toMap
+    /**
+     * JDBC config
+     */
+    object jdbc {
+      private lazy val config = database.config.getConfig("jdbc")
+
+      /**
+       * JDBC driver
+       */
+      lazy val driver = config.getString("driver")
+
+      /**
+       * Database URI
+       */
+      lazy val url = config.getString("url")
+
+      /**
+       * Database user
+       */
+      lazy val user = if (config.hasPath("user")) Some(config.getString("user")) else None
+
+      /**
+       * Database password
+       */
+      lazy val pass = if (config.hasPath("pass")) Some(config.getString("pass")) else None
+    }
   }
-  lazy val participantType = config.getString("azas.scheme.participantType")
 
-  lazy val enums: Map[String, Seq[String]] = {
-    val enums = config.getObject("azas.scheme.enums")
-    (enums.keySet map { key ⇒
-      (key, config.getStringList("azas.scheme.enums." + key).toSeq)
-    }).toSeq.toMap
+  /**
+   * Values regulating API access
+   */
+  object api {
+    private lazy val config = Config.config.getConfig("api")
+
+    /**
+     * Whether it is allowed to add or delete using the API
+     */
+    lazy val allowAdd = config.getBoolean("allowAdd")
+
+    /**
+     * Whether it is allowed to edit objects using the API
+     */
+    lazy val allowEdit = config.getBoolean("allowEdit")
+
+    /**
+     * Master password for privileged API access
+     */
+    lazy val masterPassword = config.getString("masterPassword")
+  }
+
+  /**
+   * Values for http
+   */
+  object http {
+    private lazy val config = Config.config.getConfig("http")
+
+    /**
+     * Port spray listens on
+     */
+    lazy val port = config.getInt("port")
+  }
+
+  /**
+   * Values defining the database scheme
+   */
+  object scheme {
+    private lazy val config = Config.config.getConfig("scheme")
+    /**
+     * Defined types for composing participant info
+     */
+    lazy val types: Map[String, Map[String, String]] = {
+      def helper(ty: ConfigObject): Map[String, String] =
+        (ty.keySet map { key ⇒
+          (key, ty.get(key).render().replace("\"", ""))
+        }).toSeq.toMap
+
+      val types = config.getObject("types")
+      (types.keySet map { key ⇒
+        (key, helper(config.getObject("types." + key)))
+      }).toSeq.toMap
+    }
+
+    /**
+     * Defined enums for composing participant info
+     */
+    lazy val enums: Map[String, Seq[String]] = {
+      val enums = config.getObject("enums")
+      (enums.keySet map { key ⇒
+        (key, config.getStringList("enums." + key).toSeq)
+      }).toSeq.toMap
+    }
+
+    /**
+     * Root type for participant info
+     */
+    lazy val participantType = config.getString("participantType")
   }
 }

@@ -43,16 +43,9 @@ But these are already installed on most linux systems.
 
 ### Configure
 
-After you built the application you can get a reference configuration
-using
-
-```sh
-$ unzip azas-*.jar reference.conf && mv reference.conf application.conf
-```
-
-Adjust this file to your needs. It should be documented well enough.
-If you are not absolutely sure what you are doing edit only the `azas`
-block. Spray and Akka work well with the default config.
+This repository contains an example configuration that provides a basic
+setup already. Adjust this file to your needs. It should be documented
+well enough.
 
 ### Initalize database
 

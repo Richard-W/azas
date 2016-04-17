@@ -43,7 +43,8 @@ trait RestService extends HttpService {
 
   def logException(e: Exception): Unit = {}
 
-  lazy val partValidator = Validator.get(Config.participantType)
+  lazy val partValidator = Validator.participantValidator
+  val config = Config.api
 
   /** Way too meta */
   def apiCall[T, V](name: String, handler: T ⇒ Future[V])(
@@ -102,7 +103,7 @@ trait RestService extends HttpService {
       }
 
   def handleAddPart(req: AddPartRequest): Future[GenericResponse] = {
-    if (!Config.allowAdd) return Future.failed(new ForbiddenException)
+    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
@@ -120,7 +121,7 @@ trait RestService extends HttpService {
   }
 
   def handleEditPart(req: EditPartRequest): Future[GenericResponse] = {
-    if (!Config.allowEdit) return Future.failed(new ForbiddenException)
+    if (!config.allowEdit) return Future.failed(new ForbiddenException)
     if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
@@ -140,7 +141,7 @@ trait RestService extends HttpService {
   }
 
   def handleDelPart(req: DelPartRequest): Future[GenericResponse] = {
-    if (!Config.allowAdd) return Future.failed(new ForbiddenException)
+    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -171,7 +172,7 @@ trait RestService extends HttpService {
   }
 
   def handleAddMascot(req: AddMascotRequest): Future[GenericResponse] = {
-    if (!Config.allowAdd) return Future.failed(new ForbiddenException)
+    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -187,7 +188,7 @@ trait RestService extends HttpService {
   }
 
   def handleEditMascot(req: EditMascotRequest): Future[GenericResponse] = {
-    if (!Config.allowEdit) return Future.failed(new ForbiddenException)
+    if (!config.allowEdit) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -206,7 +207,7 @@ trait RestService extends HttpService {
   }
 
   def handleDelMascot(req: DelMascotRequest): Future[GenericResponse] = {
-    if (!Config.allowAdd) return Future.failed(new ForbiddenException)
+    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -225,7 +226,7 @@ trait RestService extends HttpService {
   }
 
   def handleDumpData(req: DumpDataRequest): Future[DumpDataResponse] = {
-    if (Config.getString("azas.admin.password") != req.password) {
+    if (config.masterPassword != req.password) {
       Future.failed(new ForbiddenException)
     } else {
       db.findAllCouncils flatMap { councils ⇒

@@ -26,27 +26,17 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 class JDBCDatabase extends Database {
 
-  Class.forName(Config.getString("azas.jdbc.driver"))
-  private val url = Config.getString("azas.jdbc.url")
-  private val userOption: Option[String] = if (Config.hasPath("azas.jdbc.user")) {
-    Some(Config.getString("azas.jdbc.user"))
-  } else {
-    None
-  }
-  private val passOption: Option[String] = if (Config.hasPath("azas.jdbc.pass")) {
-    Some(Config.getString("azas.jdbc.pass"))
-  } else {
-    None
-  }
+  private val config = Config.database.jdbc
+  Class.forName(config.driver) // Initialize driver with JVM classloading magic
 
   def withConnection[T](f: Connection ⇒ T)(implicit executor: ExecutionContext): Future[T] = Future {
-    val connection = userOption match {
+    val connection = config.user match {
       case Some(user) ⇒
-        passOption match {
-          case Some(pass) ⇒ DriverManager.getConnection(url, user, pass)
+        config.pass match {
+          case Some(pass) ⇒ DriverManager.getConnection(config.url, user, pass)
           case None       ⇒ throw new RuntimeException("Username given but no password")
         }
-      case None ⇒ DriverManager.getConnection(url)
+      case None ⇒ DriverManager.getConnection(config.url)
     }
     f(connection)
   }

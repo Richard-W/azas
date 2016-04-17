@@ -3,9 +3,11 @@ import {Component, Output, EventEmitter} from 'angular2/core';
 @Component({
     selector: 'azas-token',
     template:`
-        <label for="token">Token:</label><br />
-        <input type="text" id="token" [(ngModel)]="token" />
-        <button (click)="onTokenSubmit()">Abschicken</button>
+        <form>
+            <label for="token">Token:</label><br />
+            <input type="text" id="token" [(ngModel)]="token" />
+            <button (click)="onTokenSubmit()">Abschicken</button>
+        </form>
     `
 })
 export class TokenComponent {

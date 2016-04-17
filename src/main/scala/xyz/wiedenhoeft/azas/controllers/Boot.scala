@@ -31,7 +31,11 @@ import scala.io.Source
 
 object Boot extends App {
 
-  val port = Config.getInt("azas.http.port")
+  println("Starting up AZaS")
+  System.getProperty("config.file") match {
+    case null ⇒ println("WARNING: Using default configuration")
+    case prop ⇒ println("Loading config file from " + prop)
+  }
 
   implicit val system = ActorSystem("azas")
   import system.dispatcher
@@ -75,5 +79,5 @@ object Boot extends App {
 
   val service = system.actorOf(RestServiceActor.props(db))
 
-  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = port)
+  IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = Config.http.port)
 }

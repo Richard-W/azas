@@ -7,6 +7,11 @@ sealed trait Validator {
 }
 
 object Validator {
+
+  private val config = Config.scheme
+
+  lazy val participantValidator = get(config.participantType)
+
   private val builtinValidators = Map[String, Validator] (
     "String" -> new Validator {
       override def validate(obj: JsValue): Boolean = obj match {
@@ -30,8 +35,8 @@ object Validator {
 
   def get(ty: String): Validator = {
     if (builtinValidators.contains(ty)) builtinValidators(ty)
-    else if (Config.types.contains(ty)) {
-      val typeMap = Config.types(ty)
+    else if (config.types.contains(ty)) {
+      val typeMap = config.types(ty)
       val neededValidators: Map[String, Validator] = (for (sub <- typeMap.values.toSeq.distinct) yield {
         (sub, Validator.get(sub))
       }).toMap
@@ -54,8 +59,8 @@ object Validator {
           case _ ⇒ false
         }
       }
-    } else if (Config.enums.contains(ty)) {
-      val enum = Config.enums(ty)
+    } else if (config.enums.contains(ty)) {
+      val enum = config.enums(ty)
       new Validator {
         override def validate(v: JsValue): Boolean = v match {
           case JsString(str) ⇒
