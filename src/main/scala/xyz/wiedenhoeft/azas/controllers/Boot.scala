@@ -28,6 +28,7 @@ import xyz.wiedenhoeft.azas.models.Council
 
 import scala.concurrent.duration._
 import scala.io.Source
+import scala.util.{ Failure, Success, Try }
 
 object Boot extends App {
 
@@ -41,43 +42,41 @@ object Boot extends App {
   import system.dispatcher
   implicit val timeout = Timeout(5.seconds)
 
-  var db: JDBCDatabase = null
-  try {
-    db = new JDBCDatabase
-    db.initializeTables.await
-  } catch {
-    case e: Exception ⇒
+  val db: JDBCDatabase = Try(new JDBCDatabase) flatMap { db ⇒
+    Try(db.initializeTables.await).map(_ ⇒ db)
+  } match {
+    case Success(s) ⇒ s
+    case Failure(f) ⇒
       system.terminate().await
-      throw e
+      throw f
   }
 
-  val dbInit = System.getProperty("database.seed")
-  // Insert a councils into the database
-  if (dbInit != null) {
-    val file = new File(dbInit)
-    if (!file.exists) throw new RuntimeException("database seed file does not exist")
+  System.getProperty("database.seed") match {
+    case null ⇒
+    case filePath ⇒
+      val file = new File(filePath)
+      if (!file.exists) throw new RuntimeException("database seed file does not exist")
 
-    import spray.json._
-    case class CouncilSeed(uni: String, address: String, email: String, token: String)
-    object JsonFormat extends DefaultJsonProtocol {
-      implicit val councilSeedFormat = jsonFormat4(CouncilSeed)
-    }
-    import JsonFormat._
+      import spray.json._
+      case class CouncilSeed(uni: String, address: String, email: String, token: String)
+      object JsonFormat extends DefaultJsonProtocol {
+        implicit val councilSeedFormat = jsonFormat4(CouncilSeed)
+      }
+      import JsonFormat._
 
-    val seed = Source.fromFile(file).mkString.parseJson.convertTo[Seq[CouncilSeed]]
-    for (council <- seed) {
-      db.insertCouncil(Council(
-        "",
-        council.uni,
-        council.address,
-        council.email,
-        council.token
-      )).await
-    }
-    System.exit(0)
+      val seed = Source.fromFile(file).mkString.parseJson.convertTo[Seq[CouncilSeed]]
+      for (council <- seed) {
+        db.insertCouncil(Council(
+          "",
+          council.uni,
+          council.address,
+          council.email,
+          council.token
+        )).await
+      }
+      System.exit(0)
   }
 
   val service = system.actorOf(RestServiceActor.props(db))
-
   IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = Config.http.port)
 }
