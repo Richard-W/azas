@@ -16,7 +16,6 @@
  */
 package xyz.wiedenhoeft.azas.controllers
 
-import akka.event.Logging
 import spray.http.HttpHeaders.RawHeader
 import spray.routing._
 import spray.http._
@@ -25,12 +24,11 @@ import spray.httpx.unmarshalling._
 import spray.httpx.SprayJsonSupport._
 import spray.json._
 import JsonProtocol._
-import xyz.wiedenhoeft.azas.models.{Mascot, Participant}
-import xyz.wiedenhoeft.azas.views._
+import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views.v1._
 
 import scala.concurrent._
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 trait RestService extends HttpService {
 
@@ -46,6 +44,13 @@ trait RestService extends HttpService {
   lazy val partValidator = Validator.participantValidator
   val config = Config.api
 
+  /**
+   * Actually unnecessary but needed to satisfy the analyzer of IDEA and scalariform
+   */
+  def toResponse[T](t: T)(implicit marshaller: ToResponseMarshaller[T]): ToResponseMarshallable = {
+    ToResponseMarshallable.isMarshallable(t)
+  }
+
   /** Way too meta */
   def apiCall[T, V](name: String, handler: T ⇒ Future[V])(
     implicit
@@ -59,17 +64,17 @@ trait RestService extends HttpService {
           entity(as[String]) { str ⇒
             Try(str.parseJson.convertTo[T]) match {
               case Success(req) ⇒
-                implicit def statusMarshaller = spray.httpx.marshalling.ToResponseMarshaller.fromStatusCode
-                complete(handler(req) map[ToResponseMarshallable] { res ⇒
-                  res
-                } recover[ToResponseMarshallable] {
-                  case _: ForbiddenException ⇒ StatusCodes.Forbidden
-                  case _: NotFoundException ⇒ StatusCodes.NotFound
-                  case _: BadRequestException ⇒ StatusCodes.BadRequest
+                val response: ToResponseMarshallable = handler(req) map { res ⇒
+                  toResponse(res)
+                } recover {
+                  case _: ForbiddenException  ⇒ toResponse(StatusCodes.Forbidden)
+                  case _: NotFoundException   ⇒ toResponse(StatusCodes.NotFound)
+                  case _: BadRequestException ⇒ toResponse(StatusCodes.BadRequest)
                   case e: Exception ⇒
                     logException(e)
-                    StatusCodes.InternalServerError
-                })
+                    toResponse(StatusCodes.InternalServerError)
+                }
+                complete(response)
               case Failure(f) ⇒
                 respondWithStatus(StatusCodes.BadRequest) {
                   complete("Invalid JSON request: " + f.getMessage)
