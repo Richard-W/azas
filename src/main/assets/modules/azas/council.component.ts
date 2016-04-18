@@ -8,13 +8,11 @@ import {AzasService} from './azas.service';
             <p>Loading...</p>
         </div>
         <div *ngIf="error != ''">
-            <p><b>Error</b></p>
-            <p>{{error}}</p>
+            <pre>{{error}}</pre>
         </div>
         <div *ngIf="council != null">
             <h2>{{council.info.university}}</h2>
             <h3>Teilnehmer</h3>
-            <p>{{councilString}}</p>
             <table>
                 <tbody>
                     <tr *ngFor="#participant of council.participants">
@@ -27,6 +25,7 @@ import {AzasService} from './azas.service';
             <h3>Maskottchen</h3>
             <h3>Debug</h3>
             <button (click)="onDebugClick()">Test</button>
+            <pre>{{councilString}}</pre>
         <div>
     `
 })
@@ -47,10 +46,10 @@ export class CouncilComponent implements OnInit {
         this.azas.getCouncil(this.token).subscribe(
             council => {
                 this.council = council;
-                this.councilString = JSON.stringify(council);
+                this.councilString = JSON.stringify(council, null, 2);
             },
             error => {
-                this.error = JSON.stringify(error);
+                this.error = JSON.stringify(error, null, 2);
             }
         );
     }
@@ -61,7 +60,7 @@ export class CouncilComponent implements OnInit {
                 this.reloadCouncil();
             },
             error => {
-                this.error = JSON.stringify(error);
+                this.error = JSON.stringify(error, null, 2);
             }
         );
     }
@@ -82,7 +81,7 @@ export class CouncilComponent implements OnInit {
                 this.reloadCouncil();
             },
             error => {
-                this.error = JSON.stringify(error);
+                this.error = JSON.stringify(error, null, 2);
             }
         );
     }

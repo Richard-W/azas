@@ -9,7 +9,7 @@ import {CouncilComponent} from './council.component';
         CouncilComponent
     ],
     template:`
-        <h1>AZaS - Anmeldesystem ZaPF am See</h1>
+        <h1>Anmeldung zur ZaPF</h1>
         <azas-token *ngIf="displayComponent == 'Token'" (onToken)="onToken($event)"></azas-token>
         <azas-council *ngIf="displayComponent == 'Council'" [token]="token"></azas-council>
     `
