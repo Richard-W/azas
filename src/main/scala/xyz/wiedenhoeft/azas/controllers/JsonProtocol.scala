@@ -41,4 +41,6 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val dumpDataRequest = jsonFormat1(DumpDataRequest)
   implicit val dumpDataResponse = jsonFormat3(DumpDataResponse)
   implicit val genericResponse = jsonFormat1(GenericResponse)
+  implicit val genericRequest = jsonFormat1(GenericRequest)
+  implicit val metaInfoResponse = jsonFormat1(MetaInfoResponse)
 }

@@ -96,6 +96,7 @@ trait RestService extends HttpService {
       apiCall("delmascot", handleDelMascot) ~
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
+      apiCall("metainfo", handleMetaInfo) ~
       get {
         pathPrefix("assets")(getFromResourceDirectory("assets")) ~
           path("")(getFromResource("assets/html/index.html"))
@@ -239,6 +240,12 @@ trait RestService extends HttpService {
         }
       }
     }
+  }
+
+  def handleMetaInfo(req: GenericRequest): Future[MetaInfoResponse] = {
+    Future.successful(MetaInfoResponse(
+      title = Config.meta.title
+    ))
   }
 }
 

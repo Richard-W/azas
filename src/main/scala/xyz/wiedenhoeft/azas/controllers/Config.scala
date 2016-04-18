@@ -139,4 +139,13 @@ object Config {
      */
     lazy val participantType = config.getString("participantType")
   }
+
+  /**
+   * Meta info about the deployment
+   */
+  object meta {
+    lazy val config = Config.config.getConfig("meta")
+
+    lazy val title = config.getString("title")
+  }
 }

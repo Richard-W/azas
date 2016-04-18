@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from 'angular2/core';
+import {Component, Input, OnInit, NgZone} from 'angular2/core';
 import {AzasService} from './azas.service';
 
 @Component({
@@ -36,7 +36,7 @@ export class CouncilComponent implements OnInit {
     private councilString: string = '';
     private error: string = '';
 
-    constructor(private azas: AzasService) {}
+    constructor(private azas: AzasService, private zone: NgZone) {}
 
     public ngOnInit() {
         this.reloadCouncil();

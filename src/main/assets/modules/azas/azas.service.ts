@@ -26,4 +26,8 @@ export class AzasService {
     public deleteParticipant(token: string, id: string) {
         return this.call('/v1/delpart', {'token': token, 'id': id});
     }
+
+    public getMetaInfo() {
+        return this.call('/v1/metainfo', {});
+    }
 }
