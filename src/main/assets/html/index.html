@@ -4,18 +4,18 @@
     <title>AZAS - Anmeldesystem ZaPF am See</title>
 
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
 </head>
 <body>
 <!-- Load polyfills -->
-<script src="/modules/angular2/bundles/angular2-polyfills.min.js"></script>
-<script src="/modules/systemjs/dist/system-polyfills.js"></script>
+<script src="/assets/modules/angular2/bundles/angular2-polyfills.min.js"></script>
+<script src="/assets/modules/systemjs/dist/system-polyfills.js"></script>
 
 <!-- Configure module loader -->
-<script src="/modules/systemjs/dist/system.js"></script>
+<script src="/assets/modules/systemjs/dist/system.js"></script>
 <script>
 System.config({
-    baseURL: 'modules',
+    baseURL: 'assets/modules',
     defaultJSExtensions: true,
     packages: {
         azas: {
@@ -26,9 +26,9 @@ System.config({
 </script>
 
 <!-- Load deps -->
-<script src="/modules/rxjs/bundles/Rx.min.js"></script>
-<script src="/modules/angular2/bundles/angular2.dev.js"></script>
-<script src="/modules/angular2/bundles/http.min.js"></script>
+<script src="/assets/modules/rxjs/bundles/Rx.min.js"></script>
+<script src="/assets/modules/angular2/bundles/angular2.dev.js"></script>
+<script src="/assets/modules/angular2/bundles/http.min.js"></script>
 
 <!-- Load app -->
 <script>

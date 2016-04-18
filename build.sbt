@@ -84,26 +84,18 @@ val copyModules = taskKey[Seq[File]]("Copy webjar contents and app to managed re
 copyModules := {
   streams.value.log.info("Regenerating modules in managed resources")
   val targetDirs = (managedResourceDirectories in Compile).value
-  val copy = {
+  val copy = Seq(
     /* Map the node modules from webjars */
-    val base = (webJarsNodeModulesDirectory in Assets).value
-    val files = (nodeModules in Assets).value
-    files pair Path.rebase(base, file("public") / "modules")
-  } ++ {
+    ((webJarsNodeModulesDirectory in Assets).value, (nodeModules in Assets).value, file("modules")),
     /* Map the application that is built inside this file to the azas-module */
-    val base = target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app"
-    val files = typescript.value
-    files pair Path.rebase(base, file("public") / "modules" / "azas")
-  } ++ {
+    (target.value / "web" / "typescript" / "main" / "src" / "main" / "assets" / "app", typescript.value, file("modules") / "azas"),
     /* Map the stylesheets that are built using less */
-    val base = target.value / "web" / "less" / "main" / "css"
-    val files = (less in Assets).value
-    files pair Path.rebase(base, file("public") / "css")
-  } ++ {
+    (target.value / "web" / "less" / "main" / "css", (less in Assets).value, file("css")),
     /* Map html files */
-    val base = baseDirectory.value / "src" / "main" / "assets" / "html"
-    val files = (base ** "*.html").get
-    files pair Path.rebase(base, file("public"))
+    (baseDirectory.value / "src" / "main" / "assets" / "html", (baseDirectory.value / "src" / "main" / "assets" / "html" ** "*.html").get, file("html"))
+  ) flatMap {
+    case (oldBase, files, newBase) ⇒
+      files pair Path.rebase(oldBase, file("assets") / newBase.getPath)
   } flatMap {
     /* Make the relative paths absolute */
     case (source, relativeDest) ⇒
