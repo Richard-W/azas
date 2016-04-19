@@ -109,29 +109,29 @@ object Config {
    */
   object scheme {
     private lazy val config = Config.config.getConfig("scheme")
+
+    case class Field(
+      name: String,
+      field: String,
+      ty: String,
+      options: Option[Seq[String]]
+    )
+
     /**
      * Defined types for composing participant info
      */
-    lazy val types: Map[String, Map[String, String]] = {
-      def helper(ty: ConfigObject): Map[String, String] =
-        (ty.keySet map { key ⇒
-          (key, ty.get(key).render().replace("\"", ""))
-        }).toSeq.toMap
-
-      val types = config.getObject("types")
-      (types.keySet map { key ⇒
-        (key, helper(config.getObject("types." + key)))
-      }).toSeq.toMap
-    }
-
-    /**
-     * Defined enums for composing participant info
-     */
-    lazy val enums: Map[String, Seq[String]] = {
-      val enums = config.getObject("enums")
-      (enums.keySet map { key ⇒
-        (key, config.getStringList("enums." + key).toSeq)
-      }).toSeq.toMap
+    lazy val types: Map[String, Seq[Field]] = {
+      (config.getObject("types").keySet map { key ⇒
+        val fields = config.getConfig("types").getConfigList(key) map { list ⇒
+          Field(
+            name = list.getString("name"),
+            field = list.getString("field"),
+            ty = list.getString("type"),
+            options = if (list.hasPath("options")) Some(list.getStringList("options")) else None
+          )
+        }
+        (key, fields)
+      }).toMap
     }
 
     /**
