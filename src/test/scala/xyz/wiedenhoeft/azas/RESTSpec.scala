@@ -22,8 +22,8 @@ import spray.testkit._
 import spray.httpx.SprayJsonSupport._
 import spray.json._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
-import xyz.wiedenhoeft.azas.controllers.RestService
-import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
+import xyz.wiedenhoeft.azas.controllers.{Config, RestService, Validator}
+import xyz.wiedenhoeft.azas.models.{Mascot, Participant}
 import xyz.wiedenhoeft.azas.views._
 import xyz.wiedenhoeft.azas.views.v1._
 
@@ -35,6 +35,7 @@ class RESTSpec extends FlatSpec with Matchers with ScalatestRouteTest with RestS
   implicit val db = new MockDatabase
 
   def actorRefFactory = system
+  val participantValidator = Validator.get(Config.scheme.participantType)
 
   override def beforeEach: Unit = {
     db.reset
