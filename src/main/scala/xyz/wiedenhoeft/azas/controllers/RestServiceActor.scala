@@ -26,7 +26,7 @@ object RestServiceActor {
    * @param db Initialized implementation of the db trait
    * @return Props for starting a RestServiceActor
    */
-  def props(db: Database) = Props(classOf[RestServiceActor], db)
+  def props(db: Database, participantValidator: Validator) = Props(classOf[RestServiceActor], db, participantValidator)
 }
 
 /**
@@ -34,7 +34,7 @@ object RestServiceActor {
  *
  * @param db Database implementation
  */
-class RestServiceActor(implicit val db: Database) extends Actor with RestService with ActorLogging {
+class RestServiceActor(val db: Database, val participantValidator: Validator) extends Actor with RestService with ActorLogging {
 
   implicit val routingSettings = RoutingSettings.default
   implicit val exceptionHandler = ExceptionHandler.default

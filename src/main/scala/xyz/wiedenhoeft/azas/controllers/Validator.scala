@@ -13,11 +13,6 @@ object Validator {
 
   private val config = Config.scheme
 
-  /**
-   * The validator implementation that is used to validate the info field of participant requests
-   */
-  lazy val participantValidator = get(config.participantType)
-
   private val builtinValidators = Map[String, Validator] (
     "String" -> new Validator {
       override def validate(obj: JsValue, maybeOptions: Option[Seq[String]]): Boolean = obj match {

@@ -41,7 +41,7 @@ trait RestService extends HttpService {
 
   def logException(e: Exception): Unit = {}
 
-  lazy val partValidator = Validator.participantValidator
+  val participantValidator: Validator
   val config = Config.api
 
   /**
@@ -107,7 +107,7 @@ trait RestService extends HttpService {
 
   def handleAddPart(req: AddPartRequest): Future[GenericResponse] = {
     if (!config.allowAdd) return Future.failed(new ForbiddenException)
-    if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
+    if (!participantValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -125,7 +125,7 @@ trait RestService extends HttpService {
 
   def handleEditPart(req: EditPartRequest): Future[GenericResponse] = {
     if (!config.allowEdit) return Future.failed(new ForbiddenException)
-    if (!partValidator.validate(req.info)) return Future.failed(new BadRequestException)
+    if (!participantValidator.validate(req.info)) return Future.failed(new BadRequestException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒

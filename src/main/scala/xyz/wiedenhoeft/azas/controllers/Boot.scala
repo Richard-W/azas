@@ -82,6 +82,6 @@ object Boot extends App {
       System.exit(0)
   }
 
-  val service = system.actorOf(RestServiceActor.props(db))
+  val service = system.actorOf(RestServiceActor.props(db, Validator.get(Config.scheme.participantType)))
   IO(Http) ? Http.Bind(service, interface = "127.0.0.1", port = Config.http.port)
 }
