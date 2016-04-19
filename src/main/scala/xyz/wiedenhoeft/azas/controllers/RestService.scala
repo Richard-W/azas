@@ -244,7 +244,12 @@ trait RestService extends HttpService {
 
   def handleMetaInfo(req: GenericRequest): Future[MetaInfoResponse] = {
     Future.successful(MetaInfoResponse(
-      title = Config.meta.title
+      title = Config.meta.title,
+      participantType = Config.scheme.participantType,
+      types = JsObject(Config.scheme.types map {
+        case (ty, fields) ⇒
+          (ty, JsArray((fields map { _.toJson }).toVector))
+      })
     ))
   }
 }

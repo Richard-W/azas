@@ -12,8 +12,8 @@ import {AzasService} from './azas.service';
     template:`
         <h1>{{title}}</h1>
         <pre *ngIf="error != null">{{error}}</pre>
-        <azas-token *ngIf="displayComponent == 'Token' && error == null" (onToken)="onToken($event)"></azas-token>
-        <azas-council *ngIf="displayComponent == 'Council' && error == null" [token]="token"></azas-council>
+        <azas-token [hidden]="displayComponent != 'Token' || error != null" (onToken)="onToken($event)"></azas-token>
+        <azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
     `
 })
 export class AppComponent implements OnInit {
@@ -21,12 +21,14 @@ export class AppComponent implements OnInit {
     private token = '';
     private title = '';
     private error: string = null;
+    private meta: any = null;
 
     constructor(private azas: AzasService, private zone: NgZone) {}
 
     public ngOnInit() {
         this.azas.getMetaInfo().subscribe(
             success => {
+                this.meta = success;
                 this.title = (<any> success).title;
                 this.zone.run(() => {});
             }, error => {

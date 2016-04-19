@@ -1,8 +1,10 @@
 import {Component, Input, OnInit, NgZone} from 'angular2/core';
 import {AzasService} from './azas.service';
+import {ParticipantFormComponent} from './participantform.component'
 
 @Component({
     selector: 'azas-council',
+    directives: [ParticipantFormComponent],
     template:`
         <div *ngIf="council == null && error == ''">
             <p>Loading...</p>
@@ -22,19 +24,19 @@ import {AzasService} from './azas.service';
                     </tr>
                 </tbody>
             </table>
+            <participant-form *ngIf="meta != null" [meta]="meta" (submitForm)="onSubmit($event)"></participant-form>
             <h3>Maskottchen</h3>
-            <h3>Debug</h3>
-            <button (click)="onDebugClick()">Test</button>
-            <pre>{{councilString}}</pre>
         <div>
     `
 })
 export class CouncilComponent implements OnInit {
     @Input() token: string;
+    @Input() meta: any;
 
     private council: any = null;
-    private councilString: string = '';
     private error: string = '';
+    private types: string[] = null
+    private form: any = {};
 
     constructor(private azas: AzasService, private zone: NgZone) {}
 
@@ -42,14 +44,23 @@ export class CouncilComponent implements OnInit {
         this.reloadCouncil();
     }
 
+    private keys(obj: Object): string[] {
+        return Object.keys(obj);
+    }
+
+    private typeFields(field: string): any[] {
+        return this.meta.types[field];
+    }
+
     private reloadCouncil() {
         this.azas.getCouncil(this.token).subscribe(
             council => {
                 this.council = council;
-                this.councilString = JSON.stringify(council, null, 2);
+                this.zone.run(() => {});
             },
             error => {
                 this.error = JSON.stringify(error, null, 2);
+                this.zone.run(() => {});
             }
         );
     }
@@ -65,22 +76,11 @@ export class CouncilComponent implements OnInit {
         );
     }
 
-    private onDebugClick() {
-        this.azas.addParticipant(this.token, {
-            'name': 'Testity test',
-            'email': 'testity@example.org',
-            'address': {
-                'street': 'a',
-                'zipCode': '0',
-                'city': 'b',
-                'country': 'c'
-            },
-            'excursion': 'Option 1'
-        }, 5).subscribe(
-            response => {
+    private onSubmit(event: any) {
+        this.azas.addParticipant(this.token, event, 0).subscribe(
+            success => {
                 this.reloadCouncil();
-            },
-            error => {
+            }, error => {
                 this.error = JSON.stringify(error, null, 2);
             }
         );
