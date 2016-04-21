@@ -33,6 +33,7 @@ import {ParticipantFormComponent} from './participantform.component'
 		</table>
 		<div *ngIf="displayAddParticipant">
 			<participant-form [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></participant-form>
+			<button (click)="abortAdd()">Abbrechen</button>
 		</div>
 		<div *ngIf="editeeParticipant != null"> 
 			<participant-form *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></participant-form>
@@ -131,6 +132,10 @@ export class CouncilComponent implements OnInit {
 				this.error = JSON.stringify(error, null, 2);
 			}
 		);
+		setTimeout(() => { this.displayAddParticipant = false; }, 0);
+	}
+
+	private abortAdd() {
 		setTimeout(() => { this.displayAddParticipant = false; }, 0);
 	}
 
