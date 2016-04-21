@@ -249,7 +249,8 @@ trait RestService extends HttpService {
       types = JsObject(Config.scheme.types map {
         case (ty, fields) ⇒
           (ty, JsArray((fields map { _.toJson }).toVector))
-      })
+      }),
+      numDisplayedParticipantFields = Config.meta.numDisplayedParticipantFields
     ))
   }
 }

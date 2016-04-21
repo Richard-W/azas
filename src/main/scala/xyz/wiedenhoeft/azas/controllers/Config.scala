@@ -147,5 +147,6 @@ object Config {
     lazy val config = Config.config.getConfig("meta")
 
     lazy val title = config.getString("title")
+    lazy val numDisplayedParticipantFields = config.getInt("numDisplayedParticipantFields")
   }
 }

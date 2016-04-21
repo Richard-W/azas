@@ -5,5 +5,6 @@ import spray.json.JsObject
 case class MetaInfoResponse(
   title: String,
   participantType: String,
-  types: JsObject
+  types: JsObject,
+  numDisplayedParticipantFields: Int
 )

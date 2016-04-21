@@ -7,34 +7,39 @@ import {ParticipantFormComponent} from './participantform.component'
 	directives: [ParticipantFormComponent],
 	template:`
 	<div *ngIf="council == null && error == ''">
-	<p>Loading...</p>
+		<p>Loading...</p>
 	</div>
 	<div *ngIf="error != ''">
-	<pre>{{error}}</pre>
+		<pre>{{error}}</pre>
 	</div>
 	<div *ngIf="council != null">
-	<h2>{{council.info.university}}</h2>
-	<h3>Teilnehmer</h3>
-	<table>
-	<tbody>
-	<tr *ngFor="#participant of council.participants">
-	<td>{{participant.id}}</td>
-	<td>{{participant.info.name}}</td>
-	<td>{{participant.info.email}}</td>
-	<td><button (click)="editParticipant(participant)">Edit</button></td>
-	<td><button (click)="deleteParticipant(participant.id)">Delete</button></td>
-	</tr>
-	</tbody>
-	</table>
-	<div *ngIf="displayAddParticipant">
-		<participant-form [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></participant-form>
+		<h2>{{council.info.university}}</h2>
+		<h3>Teilnehmer</h3>
+		<table>
+			<thead>
+				<tr>
+					<th *ngFor="#name of participantFieldNames()">{{name}}</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="#participant of council.participants">
+					<td *ngFor="#field of participantFields(participant)">{{field}}</td>
+					<td class="azas-buttoncell"><button (click)="editParticipant(participant)">Ändern</button></td>
+					<td class="azas-buttoncell"><button (click)="deleteParticipant(participant.id)">Löschen</button></td>
+				</tr>
+			</tbody>
+		</table>
+		<div *ngIf="displayAddParticipant">
+			<participant-form [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></participant-form>
+		</div>
+		<div *ngIf="editeeParticipant != null"> 
+			<participant-form *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></participant-form>
+		</div>
+		<button *ngIf="!displayAddParticipant" (click)="addParticipant()">Teilnehmer hinzufügen</button>
+		<h3>Maskottchen</h3>
 	</div>
-	<div *ngIf="editeeParticipant != null"> 
-		<participant-form *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></participant-form>
-	</div>
-	<button *ngIf="!displayAddParticipant" (click)="addParticipant()">Teilnehmer hinzufügen</button>
-	<h3>Maskottchen</h3>
-	<div>
 	`
 })
 export class CouncilComponent implements OnInit {
@@ -60,6 +65,19 @@ export class CouncilComponent implements OnInit {
 		return this.meta.types[field];
 	}
 
+		private deleteParticipant(id: string) {
+		this.azas.deleteParticipant(this.token, id).subscribe(
+			success => {
+				this.reloadCouncil();
+			},
+			error => {
+				this.error = JSON.stringify(error, null, 2);
+			}
+		);
+	}
+
+	/* Display participants */
+
 	private reloadCouncil() {
 		this.azas.getCouncil(this.token).subscribe(
 			council => {
@@ -73,16 +91,24 @@ export class CouncilComponent implements OnInit {
 		);
 	}
 
-	private deleteParticipant(id: string) {
-		this.azas.deleteParticipant(this.token, id).subscribe(
-			success => {
-				this.reloadCouncil();
-			},
-			error => {
-				this.error = JSON.stringify(error, null, 2);
-			}
-		);
+	private participantFieldNames() {
+		var fields: string[] = [];
+		for (var i = 0; i < this.meta.numDisplayedParticipantFields; ++i) {
+			var field = this.meta.types[this.meta.participantType][i];
+			fields.push(field.name);
+		}
+		return fields;
 	}
+
+	private participantFields(participant: any) {
+		var fields: string[] = [];
+		for (var i = 0; i < this.meta.numDisplayedParticipantFields; ++i) {
+			var field = this.meta.types[this.meta.participantType][i];
+			fields.push(participant.info[field.field]);
+		}
+		return fields;
+	}
+
 
 	/* Add participant */
 
