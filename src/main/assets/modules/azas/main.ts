@@ -5,7 +5,7 @@ import {AzasService}    from './azas.service';
 import {HTTP_PROVIDERS} from 'angular2/http';
 
 export function azasBootstrap(host: string) {
-    enableProdMode();
-    AzasService.host = host;
-    bootstrap(AppComponent, [HTTP_PROVIDERS, AzasService]);
+	enableProdMode();
+	AzasService.host = host;
+	bootstrap(AppComponent, [HTTP_PROVIDERS, AzasService]);
 }

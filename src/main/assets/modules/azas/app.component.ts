@@ -4,42 +4,42 @@ import {CouncilComponent} from './council.component';
 import {AzasService} from './azas.service';
 
 @Component({
-    selector: 'azas',
-    directives: [
-        TokenComponent,
-        CouncilComponent
-    ],
-    template:`
-        <h1>{{title}}</h1>
-        <pre *ngIf="error != null">{{error}}</pre>
-        <azas-token [hidden]="displayComponent != 'Token' || error != null" (onToken)="onToken($event)"></azas-token>
-        <azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
-    `
+	selector: 'azas',
+	directives: [
+		TokenComponent,
+		CouncilComponent
+	],
+	template:`
+	<h1>{{title}}</h1>
+	<pre *ngIf="error != null">{{error}}</pre>
+	<azas-token [hidden]="displayComponent != 'Token' || error != null" (onToken)="onToken($event)"></azas-token>
+	<azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
+	`
 })
 export class AppComponent implements OnInit {
-    private displayComponent = 'Token';
-    private token = '';
-    private title = '';
-    private error: string = null;
-    private meta: any = null;
+	private displayComponent = 'Token';
+	private token = '';
+	private title = '';
+	private error: string = null;
+	private meta: any = null;
 
-    constructor(private azas: AzasService, private zone: NgZone) {}
+	constructor(private azas: AzasService, private zone: NgZone) {}
 
-    public ngOnInit() {
-        this.azas.getMetaInfo().subscribe(
-            success => {
-                this.meta = success;
-                this.title = (<any> success).title;
-                this.zone.run(() => {});
-            }, error => {
-                this.error = JSON.stringify(error, null, 2);
-                this.zone.run(() => {});
-            }
-        );
-    }
+	public ngOnInit() {
+		this.azas.getMetaInfo().subscribe(
+			success => {
+				this.meta = success;
+				this.title = (<any> success).title;
+				this.zone.run(() => {});
+			}, error => {
+				this.error = JSON.stringify(error, null, 2);
+				this.zone.run(() => {});
+			}
+		);
+	}
 
-    private onToken(event: string) {
-        this.token = event;
-        this.displayComponent = 'Council';
-    }
+	private onToken(event: string) {
+		this.token = event;
+		this.displayComponent = 'Council';
+	}
 }

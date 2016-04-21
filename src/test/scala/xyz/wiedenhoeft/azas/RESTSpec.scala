@@ -22,8 +22,8 @@ import spray.testkit._
 import spray.httpx.SprayJsonSupport._
 import spray.json._
 import xyz.wiedenhoeft.azas.controllers.JsonProtocol._
-import xyz.wiedenhoeft.azas.controllers.{Config, RestService, Validator}
-import xyz.wiedenhoeft.azas.models.{Mascot, Participant}
+import xyz.wiedenhoeft.azas.controllers.{ Config, RestService, Validator }
+import xyz.wiedenhoeft.azas.models.{ Mascot, Participant }
 import xyz.wiedenhoeft.azas.views._
 import xyz.wiedenhoeft.azas.views.v1._
 
