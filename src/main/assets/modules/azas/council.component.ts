@@ -27,8 +27,8 @@ import {Council, MetaInfo} from './types';
 			<tbody>
 				<tr *ngFor="#participant of council.participants">
 					<td *ngFor="#field of participantFields(participant)">{{field}}</td>
-					<td class="azas-buttoncell"><button (click)="editParticipant(participant)">Ändern</button></td>
-					<td class="azas-buttoncell"><button (click)="deleteParticipant(participant.id)">Löschen</button></td>
+					<td class="azasbuttoncell"><button (click)="editParticipant(participant)">Ändern</button></td>
+					<td class="azasbuttoncell"><button (click)="deleteParticipant(participant.id)">Löschen</button></td>
 				</tr>
 			</tbody>
 		</table>

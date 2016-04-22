@@ -11,10 +11,12 @@ import {MetaInfo} from './types';
 		CouncilComponent
 	],
 	template:`
-	<h1>{{title}}</h1>
-	<pre *ngIf="error != null">{{error}}</pre>
-	<azas-token   *ngIf="displayComponent == 'Token'   && error == null"                 (onToken)="onToken($event)"></azas-token>
-	<azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
+	<div id="azas">
+		<h1>{{title}}</h1>
+		<div          *ngIf="error != null"                                                                               ><pre>{{error}}</pre></div>
+		<azas-token   *ngIf="displayComponent == 'Token'   && error == null"                 (onToken)="onToken($event)"  ></azas-token>
+		<azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
+	</div>
 	`
 })
 export class AppComponent implements OnInit {
