@@ -2,6 +2,7 @@ import {Component, OnInit, NgZone} from 'angular2/core';
 import {TokenComponent} from './token.component';
 import {CouncilComponent} from './council.component';
 import {AzasService} from './azas.service';
+import {MetaInfo} from './types';
 
 @Component({
 	selector: 'azas',
@@ -12,7 +13,7 @@ import {AzasService} from './azas.service';
 	template:`
 	<h1>{{title}}</h1>
 	<pre *ngIf="error != null">{{error}}</pre>
-	<azas-token [hidden]="displayComponent != 'Token' || error != null" (onToken)="onToken($event)"></azas-token>
+	<azas-token   *ngIf="displayComponent == 'Token'   && error == null"                 (onToken)="onToken($event)"></azas-token>
 	<azas-council *ngIf="displayComponent == 'Council' && error == null && meta != null" [token]="token" [meta]="meta"></azas-council>
 	`
 })
@@ -21,7 +22,7 @@ export class AppComponent implements OnInit {
 	private token = '';
 	private title = '';
 	private error: string = null;
-	private meta: any = null;
+	private meta: MetaInfo = null;
 
 	constructor(private azas: AzasService, private zone: NgZone) {}
 
@@ -40,6 +41,6 @@ export class AppComponent implements OnInit {
 
 	private onToken(event: string) {
 		this.token = event;
-		this.displayComponent = 'Council';
+		setTimeout(() => { this.displayComponent = 'Council'; }, 0);
 	}
 }

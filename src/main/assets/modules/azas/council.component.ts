@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, NgZone} from 'angular2/core';
 import {AzasService} from './azas.service';
 import {ParticipantFormComponent} from './participantform.component'
+import {Council, MetaInfo} from './types';
 
 @Component({
 	selector: 'azas-council',
@@ -46,12 +47,10 @@ import {ParticipantFormComponent} from './participantform.component'
 })
 export class CouncilComponent implements OnInit {
 	@Input() token: string;
-	@Input() meta: any;
+	@Input() meta: MetaInfo;
 
-	private council: any = null;
+	private council: Council = null;
 	private error: string = '';
-	private types: string[] = null
-	private form: any = {};
 
 	constructor(private azas: AzasService, private zone: NgZone) {}
 
@@ -59,15 +58,7 @@ export class CouncilComponent implements OnInit {
 		this.reloadCouncil();
 	}
 
-	private keys(obj: Object): string[] {
-		return Object.keys(obj);
-	}
-
-	private typeFields(field: string): any[] {
-		return this.meta.types[field];
-	}
-
-		private deleteParticipant(id: string) {
+	private deleteParticipant(id: string) {
 		this.azas.deleteParticipant(this.token, id).subscribe(
 			success => {
 				this.reloadCouncil();
