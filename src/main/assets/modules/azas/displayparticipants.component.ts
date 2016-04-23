@@ -4,7 +4,8 @@ import {Participant, MetaInfo} from './types';
 @Component({
 	selector: 'azas-displayparticipants',
 	template:`
-	<table>
+	<p *ngIf="participants.length == 0">Noch keine Anmeldungen</p>
+	<table *ngIf="participants.length > 0">
 		<thead>
 			<tr>
 				<th *ngFor="#name of participantFieldNames()">{{name}}</th>
@@ -14,10 +15,6 @@ import {Participant, MetaInfo} from './types';
 			<tr *ngFor="#participant of participants">
 				<td *ngFor="#field of participantFields(participant)">{{field}}</td>
 				<td *ngFor="#action of actions"><button (click)="onAction(action.id, participant)">{{action.name}}</button></td>
-				<!--
-				<td class="azasbuttoncell"><button (click)="editParticipant(participant)">Ändern</button></td>
-				<td class="azasbuttoncell"><button (click)="deleteParticipant(participant.id)">Löschen</button></td>
-				-->
 			</tr>
 		</tbody>
 	</table>
