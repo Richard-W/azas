@@ -5,7 +5,7 @@ function compileToComponent(template: string) {
 }
 
 @Component({
-	selector: 'participant-form',
+	selector: 'azas-participantform',
 	template: '<div #partformcontainer></div>',
 })
 export class ParticipantFormComponent implements OnInit {

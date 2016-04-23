@@ -26,13 +26,13 @@ export class AzasService {
 			map(obj => (<string> (<any> obj).id));
 	}
 
-	public deleteParticipant(token: string, id: string): Observable<void> {
-		return this.call('/v1/delpart', {'token': token, 'id': id}).
+	public deleteParticipant(token: string, participant: Participant): Observable<void> {
+		return this.call('/v1/delpart', {'token': token, 'id': participant.id}).
 			map(obj => { return; });
 	}
 
-	public editParticipant(token: string, id: string, info: any, priority: number): Observable<void> {
-		return this.call('/v1/editpart', {'token': token, 'id': id, 'info': info, 'priority': priority}).
+	public editParticipant(token: string, participant: Participant): Observable<void> {
+		return this.call('/v1/editpart', {'token': token, 'id': participant.id, 'info': participant.info, 'priority': participant.priority}).
 			map(obj => { return; });
 	}
 
@@ -41,13 +41,13 @@ export class AzasService {
 			map(obj => (<string> (<any> obj).id));
 	}
 
-	public editMascot(token: string, id: string, fullName: string, nickName: string): Observable<void> {
-		return this.call('/v1/editmascot', {'token': token, 'id': id, 'fullName': fullName, 'nickName': nickName}).
+	public editMascot(token: string, mascot: Mascot): Observable<void> {
+		return this.call('/v1/editmascot', {'token': token, 'id': mascot.id, 'fullName': mascot.fullName, 'nickName': mascot.nickName}).
 			map(obj => { return; });
 	}
 
-	public deleteMascot(token: string, id: string): Observable<void> {
-		return this.call('/v1/delmascot', {'token': token, 'id': id}).
+	public deleteMascot(token: string, mascot: Mascot): Observable<void> {
+		return this.call('/v1/delmascot', {'token': token, 'id': mascot.id}).
 			map(obj => { return; });
 	}
 

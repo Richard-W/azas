@@ -1,11 +1,15 @@
 import {Component, Input, OnInit, NgZone} from 'angular2/core';
 import {AzasService} from './azas.service';
-import {ParticipantFormComponent} from './participantform.component'
-import {Council, MetaInfo} from './types';
+import {ParticipantFormComponent} from './participantform.component';
+import {DisplayParticipantsComponent} from './displayparticipants.component';
+import {Council, MetaInfo, Participant} from './types';
 
 @Component({
 	selector: 'azas-council',
-	directives: [ParticipantFormComponent],
+	directives: [
+		ParticipantFormComponent,
+		DisplayParticipantsComponent
+	],
 	template:`
 	<div *ngIf="council == null && error == ''">
 		<p>Loading...</p>
@@ -16,28 +20,13 @@ import {Council, MetaInfo} from './types';
 	<div *ngIf="council != null">
 		<h2>{{council.info.university}}</h2>
 		<h3>Teilnehmer</h3>
-		<table>
-			<thead>
-				<tr>
-					<th *ngFor="#name of participantFieldNames()">{{name}}</th>
-					<th></th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr *ngFor="#participant of council.participants">
-					<td *ngFor="#field of participantFields(participant)">{{field}}</td>
-					<td class="azasbuttoncell"><button (click)="editParticipant(participant)">Ändern</button></td>
-					<td class="azasbuttoncell"><button (click)="deleteParticipant(participant.id)">Löschen</button></td>
-				</tr>
-			</tbody>
-		</table>
+		<azas-displayparticipants [meta]="meta" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}]" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
 		<div *ngIf="displayAddParticipant">
-			<participant-form [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></participant-form>
+			<azas-participantform [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></azas-participantform>
 			<button (click)="abortAdd()">Abbrechen</button>
 		</div>
 		<div *ngIf="editeeParticipant != null"> 
-			<participant-form *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></participant-form>
+			<azas-participantform *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></azas-participantform>
 			<button (click)="abortEdit()">Abbrechen</button>
 		</div>
 		<button *ngIf="!displayAddParticipant" (click)="addParticipant()">Teilnehmer hinzufügen</button>
@@ -58,8 +47,19 @@ export class CouncilComponent implements OnInit {
 		this.reloadCouncil();
 	}
 
-	private deleteParticipant(id: string) {
-		this.azas.deleteParticipant(this.token, id).subscribe(
+	private onParticipantsAction(action: {id: number, target: Participant}) {
+		switch (action.id) {
+		case 0:
+			this.editParticipant(action.target);
+			break;
+		case 1:
+			this.deleteParticipant(action.target);
+			break;
+		}
+	}
+
+	private deleteParticipant(participant: Participant) {
+		this.azas.deleteParticipant(this.token, participant).subscribe(
 			success => {
 				this.reloadCouncil();
 			},
@@ -142,7 +142,8 @@ export class CouncilComponent implements OnInit {
 	}
 
 	private onSubmitEditParticipant(event: any) {
-		this.azas.editParticipant(this.token, this.editeeParticipant.id, event, this.editeeParticipant.priority).subscribe(
+		this.editeeParticipant.info = event;
+		this.azas.editParticipant(this.token, this.editeeParticipant).subscribe(
 			success => {
 				this.reloadCouncil();
 			}, error => {
