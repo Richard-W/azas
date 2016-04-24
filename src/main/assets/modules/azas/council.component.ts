@@ -112,10 +112,10 @@ export class CouncilComponent implements OnInit {
 		var observable: Observable<void> = null;
 
 		for(var keyString in this.council.participants) {
-			var key: number = parseInt(keyString)
+			var key: number = parseInt(keyString);
 			if(key != this.council.participants[key].priority) {
 				this.council.participants[key].priority = key;
-				var edit = this.azas.editParticipant(this.token, this.council.participants[key]));
+				var edit = this.azas.editParticipant(this.token, this.council.participants[key]);
 				if (observable == null) observable = edit;
 				else observable = Observable.merge(observable, edit);
 			}
