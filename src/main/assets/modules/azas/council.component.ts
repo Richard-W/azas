@@ -5,6 +5,7 @@ import {DisplayParticipantsComponent} from './displayparticipants.component';
 import {MascotFormComponent} from './mascotform.component';
 import {DisplayMascotsComponent} from './displaymascots.component';
 import {Council, MetaInfo, Participant, Mascot} from './types';
+import {Observable} from 'rxjs/Rx';
 
 @Component({
 	selector: 'azas-council',
@@ -24,13 +25,13 @@ import {Council, MetaInfo, Participant, Mascot} from './types';
 	<div *ngIf="council != null">
 		<h2>{{council.info.university}}</h2>
 		<h3>Teilnehmer</h3>
-		<azas-displayparticipants [meta]="meta" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}]" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
+		<azas-displayparticipants [meta]="meta" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}, {id: 2, name: '\u{2191}'}, {id: 3, name: '\u{2193}'}]" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
 		<div *ngIf="displayAddParticipant">
 			<azas-participantform [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></azas-participantform>
 			<button (click)="abortAdd()">Abbrechen</button>
 		</div>
 		<div *ngIf="editeeParticipant != null"> 
-			<azas-participantform *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipantInfo" [submitText]="'Ändern'"></azas-participantform>
+			<azas-participantform *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipant.info" [submitText]="'Ändern'"></azas-participantform>
 			<button (click)="abortEdit()">Abbrechen</button>
 		</div>
 		<button *ngIf="!displayAddParticipant" (click)="addParticipant()">Teilnehmer hinzufügen</button>
@@ -69,6 +70,65 @@ export class CouncilComponent implements OnInit {
 		case 1:
 			this.deleteParticipant(action.target);
 			break;
+		case 2:
+			if(this.council.participants.length > 1) {
+				var index = this.council.participants.indexOf(action.target);
+				if (index > 0) {
+					this.swapPriority(index, index - 1);
+				}
+			}
+			break;
+		case 3:
+			if(this.council.participants.length > 1) {
+				var index = this.council.participants.indexOf(action.target);
+				if (index < (this.council.participants.length - 1)) {
+					this.swapPriority(index, index + 1);
+				}
+			}
+			break;
+		}
+	}
+
+	private swapPriority(i: number, j: number) {
+		var p1 = this.council.participants[i];
+		var p2 = this.council.participants[j];
+		var swap = p1.priority;
+		p1.priority = p2.priority;
+		p2.priority = swap;
+		var obs1 = this.azas.editParticipant(this.token, p1);
+		var obs2 = this.azas.editParticipant(this.token, p2);
+		var obs = Observable.merge(obs1, obs2);
+		obs.subscribe(
+			null,
+			error => {
+				this.error = JSON.stringify(error, null, 2);
+			}, () => {
+				this.reloadCouncil();
+			}
+		);
+	}
+
+	private validatePriorities() {
+		var observable: Observable<void> = null;
+
+		for(var keyString in this.council.participants) {
+			var key: number = parseInt(keyString)
+			if(key != this.council.participants[key].priority) {
+				this.council.participants[key].priority = key;
+				var edit = this.azas.editParticipant(this.token, this.council.participants[key]));
+				if (observable == null) observable = edit;
+				else observable = Observable.merge(observable, edit);
+			}
+		}
+		if(observable != null) {
+			observable.subscribe(
+				null,
+				error => {
+					this.error = JSON.stringify(error, null, 2);
+				}, () => {
+					this.reloadCouncil();
+				}
+			);
 		}
 	}
 
@@ -100,6 +160,8 @@ export class CouncilComponent implements OnInit {
 		this.azas.getCouncil(this.token).subscribe(
 			council => {
 				this.council = council;
+				this.council.participants.sort((p1, p2) => p1.priority - p2.priority);
+				this.validatePriorities();
 				this.zone.run(() => {});
 			},
 			error => {
@@ -135,11 +197,16 @@ export class CouncilComponent implements OnInit {
 	private addParticipant(id: string) {
 		this.displayAddParticipant = true;
 		this.editeeParticipant = null;
-		this.editeeParticipantInfo = null;
 	}
 
 	private onSubmitAddParticipant(event: any) {
-		this.azas.addParticipant(this.token, event, 0).subscribe(
+		var priority: number
+		if(this.council.participants.length == 0) {
+			priority = 0;
+		} else {
+			priority = this.council.participants[this.council.participants.length - 1].priority + 1;
+		}
+		this.azas.addParticipant(this.token, event, priority).subscribe(
 			success => {
 				this.displayAddParticipant = false;
 				this.reloadCouncil();
@@ -157,12 +224,10 @@ export class CouncilComponent implements OnInit {
 
 	/* Edit participant */
 
-	private editeeParticipant: any = null;
-	private editeeParticipantInfo: any = null;
+	private editeeParticipant: Participant = null;
 
-	private editParticipant(participant: any) {
-		this.editeeParticipant = participant;
-		this.editeeParticipantInfo = participant.info;
+	private editParticipant(participant: Participant) {
+		this.editeeParticipant = JSON.parse(JSON.stringify(participant));
 		setTimeout(() => { this.displayAddParticipant = false; }, 0);
 	}
 
@@ -176,12 +241,10 @@ export class CouncilComponent implements OnInit {
 			}
 		);
 		setTimeout(() => { this.editeeParticipant = null; }, 0);
-		this.editeeParticipantInfo = null;
 	}
 
 	private abortEdit() {
 		setTimeout(() => { this.editeeParticipant = null; }, 0);
-		this.editeeParticipantInfo = null;
 	}
 
 	/* Add mascot */
@@ -213,7 +276,7 @@ export class CouncilComponent implements OnInit {
 	private editeeMascot: Mascot = null;
 
 	private editMascot(mascot: Mascot) {
-		this.editeeMascot = mascot;
+		this.editeeMascot = JSON.parse(JSON.stringify(mascot));
 		setTimeout(() => { this.displayAddMascot = false });
 	}
 
