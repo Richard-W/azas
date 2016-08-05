@@ -113,14 +113,14 @@ look like this:
 </head>
 <body>
 <!-- Load polyfills -->
-<script src="http://url.to.azas/modules/angular2/bundles/angular2-polyfills.min.js"></script>
-<script src="/modules/systemjs/dist/system-polyfills.js"></script>
+<script src="http://url.to.azas/assets/modules/angular2/bundles/angular2-polyfills.min.js"></script>
+<script src="assets/modules/systemjs/dist/system-polyfills.js"></script>
 
 <!-- Configure module loader -->
-<script src="http://url.to.azas/modules/systemjs/dist/system.js"></script>
+<script src="http://url.to.azas/assets/modules/systemjs/dist/system.js"></script>
 <script>
 System.config({
-    baseURL: 'https://url.to.azas/modules',
+    baseURL: 'https://url.to.azas/assets/modules',
     defaultJSExtensions: true,
     packages: {
         azas: {
@@ -134,9 +134,9 @@ System.config({
 Load dependencies. This is not strictly necessary but you will want to
 do it if you do not like loading times longer than 10 seconds
 -->
-<script src="http://url.to.azas/modules/rxjs/bundles/Rx.min.js"></script>
-<script src="http://url.to.azas/modules/angular2/bundles/angular2.dev.js"></script>
-<script src="http://url.to.azas/modules/angular2/bundles/http.min.js"></script>
+<script src="http://url.to.azas/assets/modules/rxjs/bundles/Rx.min.js"></script>
+<script src="http://url.to.azas/assets/modules/angular2/bundles/angular2.dev.js"></script>
+<script src="http://url.to.azas/assets/modules/angular2/bundles/http.min.js"></script>
 
 <!-- Load app -->
 <script>
