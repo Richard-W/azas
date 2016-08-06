@@ -38,6 +38,8 @@ version := "1.2-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
+scalacOptions := Seq("-target:jvm-1.7")
+
 /* Configure formatter plugin to
  * -> Align single line case statements
  * -> Preserve spaces before arguments for more beautiful scalatest statements
