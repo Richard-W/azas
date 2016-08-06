@@ -8,7 +8,8 @@ lazy val azas = (project in file("."))
   .enablePlugins(
     SbtWeb,
     LinuxPlugin,
-    RpmPlugin
+    RpmPlugin,
+    DebianPlugin
   )
 
 name := "azas"
@@ -205,3 +206,33 @@ rpmPostun := Some("""
 rpmLicense := Some("AGPLv3")
 
 linuxPackageMappings in Rpm := linuxPackageMappings.value
+
+/* Debian settings */
+
+maintainer := "Richard Wiedenhöft <richard@wiedenhoeft.xyz>"
+
+maintainerScripts in Debian := maintainerScriptsAppend((maintainerScripts in Debian).value)(
+  "preinst" ->
+    """
+      |addGroup azas 126119
+      |addUser azas 126119 azas "AZAS system user"
+    """.stripMargin,
+  "postinst" ->
+    """
+      |systemctl daemon-reload
+      |systemctl try-restart azas
+      |chown -R azas:azas /var/lib/azas
+      |chmod -R 750 /var/lib/azas
+      |chown root:root /etc/azas.conf
+      |chmod 600 /etc/azas.conf
+    """.stripMargin,
+  "prerm" ->
+    """
+      |systemctl stop azas
+    """.stripMargin,
+  "postrm" ->
+    """
+      |deleteUser azas
+      |deleteGroup azas
+    """.stripMargin
+)
