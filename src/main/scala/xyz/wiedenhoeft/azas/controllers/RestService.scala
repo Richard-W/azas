@@ -99,7 +99,11 @@ trait RestService extends HttpService {
       apiCall("metainfo", handleMetaInfo) ~
       get {
         pathPrefix("assets")(getFromResourceDirectory("assets")) ~
-          path("")(getFromResource("assets/html/index.html"))
+          path("") {
+            respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+              getFromResource("assets/html/index.html")
+            }
+          }
       } ~
       respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
         complete(StatusCodes.NotFound)
