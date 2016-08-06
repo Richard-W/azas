@@ -19,6 +19,7 @@ package xyz.wiedenhoeft.azas.controllers
 import com.typesafe.config._
 
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 /**
  * Singleton object that provides easy access to configuration parameters
@@ -114,6 +115,7 @@ object Config {
       name: String,
       field: String,
       ty: String,
+      required: Boolean,
       options: Option[Seq[String]]
     )
 
@@ -127,6 +129,7 @@ object Config {
             name = list.getString("name"),
             field = list.getString("field"),
             ty = list.getString("type"),
+            required = Try(list.getBoolean("required")).getOrElse(false),
             options = if (list.hasPath("options")) Some(list.getStringList("options")) else None
           )
         }
