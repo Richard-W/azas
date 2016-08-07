@@ -8,11 +8,14 @@ import {Participant, MetaInfo} from './types';
 	<table *ngIf="participants.length > 0">
 		<thead>
 			<tr>
+				<th></th>
 				<th *ngFor="#name of participantFieldNames()">{{name}}</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr *ngFor="#participant of participants">
+				<td *ngIf="participant.approved" class="approval approved">&#10003;</td>
+				<td *ngIf="!participant.approved" class="approval notApproved">&nbsp;</td>
 				<td *ngFor="#field of participantFields(participant)">{{field}}</td>
 				<td *ngFor="#action of actions"><button (click)="onAction(action.id, participant)">{{action.name}}</button></td>
 			</tr>
