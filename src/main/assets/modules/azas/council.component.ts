@@ -26,9 +26,9 @@ import {Observable} from 'rxjs/Rx';
 		<h2>{{council.info.university}}</h2>
 		<h3>Teilnehmer</h3>
 		<div id="azasDeletionConfirmation" *ngIf="deletee != null">
-		<p>Wirklich löschen?</p>
-		<button (click)="deleteParticipant(deletee)">Ja</button>
-		<button (click)="deletee = null">Nein</button>
+			<p>Wirklich löschen?</p>
+			<button (click)="deleteParticipant(deletee)">Ja</button>
+			<button (click)="deletee = null">Nein</button>
 		</div>
 		<azas-displayparticipants [meta]="meta" [actions]="actions" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
 		<div *ngIf="displayAddParticipant">
