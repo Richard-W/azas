@@ -97,16 +97,15 @@ trait RestService extends HttpService {
       apiCall("getcouncil", handleGetCouncil) ~
       apiCall("dumpdata", handleDumpData) ~
       apiCall("metainfo", handleMetaInfo) ~
-      get {
-        pathPrefix("assets")(getFromResourceDirectory("assets")) ~
-          path("") {
-            respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+      respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+        get {
+          pathPrefix("assets")(getFromResourceDirectory("assets")) ~
+            path("") {
               getFromResource("assets/html/index.html")
             }
-          }
-      } ~
-      respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
-        complete(StatusCodes.NotFound)
+        } ~ {
+          complete(StatusCodes.NotFound)
+        }
       }
 
   def handleAddPart(req: AddPartRequest): Future[GenericResponse] = {
