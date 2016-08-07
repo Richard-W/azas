@@ -34,6 +34,13 @@ System.config({
 <script>
 System.import('azas/main').then(function(module) {
     module.azasBootstrap('http://localhost:8080');
+    module.azasDecideFormFieldDisplay(function(model, field) {
+	if (field == "meat" && model.food != "Omnivor") {
+	    return false;
+	} else {
+	    return true;
+	}
+    });
 }, console.error.bind(console));
 </script>
 
