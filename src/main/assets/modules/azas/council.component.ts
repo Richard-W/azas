@@ -25,6 +25,11 @@ import {Observable} from 'rxjs/Rx';
 	<div *ngIf="council != null">
 		<h2>{{council.info.university}}</h2>
 		<h3>Teilnehmer</h3>
+		<div id="azasDeletionConfirmation" *ngIf="deletee != null">
+		<p>Wirklich löschen?</p>
+		<button (click)="deleteParticipant(deletee)">Ja</button>
+		<button (click)="deletee = null">Nein</button>
+		</div>
 		<azas-displayparticipants [meta]="meta" [actions]="actions" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
 		<div *ngIf="displayAddParticipant">
 			<azas-participantform [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></azas-participantform>
@@ -58,6 +63,7 @@ export class CouncilComponent implements OnInit {
 	private council: Council = null;
 	private error: string = '';
 	private actions: any[] = [];
+	private deletee: Participant = null;
 
 	constructor(private azas: AzasService, private zone: NgZone) {}
 
@@ -81,7 +87,7 @@ export class CouncilComponent implements OnInit {
 			this.editParticipant(action.target);
 			break;
 		case 1:
-			this.deleteParticipant(action.target);
+			this.deletee = action.target;
 			break;
 		case 2:
 			if(this.council.participants.length > 1) {
@@ -165,6 +171,7 @@ export class CouncilComponent implements OnInit {
 				this.error = JSON.stringify(error, null, 2);
 			}
 		);
+		this.deletee = null;
 	}
 
 	/* Display participants */
