@@ -9,7 +9,7 @@ import {Participant, MetaInfo} from './types';
 		<thead>
 			<tr>
 				<th></th>
-				<th *ngFor="#name of participantFieldNames()">{{name}}</th>
+				<th *ngFor="#info of participantFieldInfo()" [attr.id]="'ph_'+info.field">{{info.name}}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -30,11 +30,11 @@ export class DisplayParticipantsComponent {
 	
 	@Output() action: EventEmitter<{ id: number, target: Participant }> = new EventEmitter<{ id: number, target: Participant }>();
 
-	private participantFieldNames() {
-		var fields: string[] = [];
+	private participantFieldInfo() {
+		var fields: any[] = [];
 		for (var i = 0; i < this.meta.numDisplayedParticipantFields; ++i) {
 			var field = this.meta.types[this.meta.participantType][i];
-			fields.push(field.name);
+			fields.push(field);
 		}
 		return fields;
 	}
