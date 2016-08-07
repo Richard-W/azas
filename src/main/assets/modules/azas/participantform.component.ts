@@ -30,7 +30,7 @@ export class ParticipantFormComponent implements OnInit {
 				case "Int":
 					template += "<label>"+field.name+"</label><br />";
 					template += "<input type=\"number\" [(ngModel)]=\""+modelPrefix+"."+field.field+"\" /><br />";
-					model[field.field] = "";
+					model[field.field] = 0;
 					break;
 				case "String":
 					template += "<label>"+field.name+"</label><br />";
@@ -80,7 +80,7 @@ export class ParticipantFormComponent implements OnInit {
 			private intModelChange(input: any): any {
 				var newModel: number = parseInt(input);
 				if (isNaN(newModel)) {
-					return "";
+					return 0;
 				} else {
 					return newModel;
 				}
