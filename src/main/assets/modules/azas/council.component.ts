@@ -50,6 +50,8 @@ import {Observable} from 'rxjs/Rx';
 	`
 })
 export class CouncilComponent implements OnInit {
+	public static consumeCouncil(council: Council): void {}
+
 	@Input() token: string;
 	@Input() meta: MetaInfo;
 
@@ -162,6 +164,7 @@ export class CouncilComponent implements OnInit {
 				this.council = council;
 				this.council.participants.sort((p1, p2) => p1.priority - p2.priority);
 				this.validatePriorities();
+				CouncilComponent.consumeCouncil(this.council);
 				this.zone.run(() => {});
 			},
 			error => {
