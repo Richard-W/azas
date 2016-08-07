@@ -35,7 +35,7 @@ export class ParticipantFormComponent implements OnInit {
 				case "String":
 					template += "<label>"+field.name+"</label><br />";
 					if (field.options) {
-						template += "<select [(ngModel)]=\""+modelPrefix+"."+field.field+"\">";
+						template += "<select [(ngModel)]=\""+modelPrefix+"."+field.field+"\" (change)=\""+modelPrefix+"."+field.field+" = $event.target.selectedOptions[0].label\">";
 						template += "<option *ngFor=\"#option of options["+nextID+"]\" [ngValue]=\"option\">{{option}}</option>";
 						template += "</select><br />";
 						model[field.field] = field.options[0]
