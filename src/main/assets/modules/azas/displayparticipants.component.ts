@@ -5,7 +5,7 @@ import {Participant, MetaInfo} from './types';
 	selector: 'azas-displayparticipants',
 	template:`
 	<p *ngIf="participants.length == 0">Noch keine Anmeldungen</p>
-	<table *ngIf="participants.length > 0">
+	<table *ngIf="participants.length > 0" id="ptable">
 		<thead>
 			<tr>
 				<th></th>
@@ -13,9 +13,9 @@ import {Participant, MetaInfo} from './types';
 			</tr>
 		</thead>
 		<tbody>
-			<tr *ngFor="#participant of participants">
-				<td *ngIf="participant.approved" class="approval approved">&#10003;</td>
-				<td *ngIf="!participant.approved" class="approval notApproved">&nbsp;</td>
+			<tr *ngFor="#participant of participants" [attr.id]="'p'+participant.id" [ngClass]="{approved: participant.approved, notApproved: !participant.approved}">
+				<td *ngIf="participant.approved" class="approval">&#10003;</td>
+				<td *ngIf="!participant.approved" class="approval">&nbsp;</td>
 				<td *ngFor="#field of participantFields(participant)">{{field}}</td>
 				<td *ngFor="#action of actions"><button (click)="onAction(action.id, participant)">{{action.name}}</button></td>
 			</tr>
