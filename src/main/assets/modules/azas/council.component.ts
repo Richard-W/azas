@@ -25,7 +25,7 @@ import {Observable} from 'rxjs/Rx';
 	<div *ngIf="council != null">
 		<h2>{{council.info.university}}</h2>
 		<h3>Teilnehmer</h3>
-		<azas-displayparticipants [meta]="meta" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}, {id: 2, name: '\u{2191}'}, {id: 3, name: '\u{2193}'}]" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
+		<azas-displayparticipants [meta]="meta" [actions]="actions" [participants]="council.participants" (action)="onParticipantsAction($event)"></azas-displayparticipants>
 		<div *ngIf="displayAddParticipant">
 			<azas-participantform [meta]="meta" (submitForm)="onSubmitAddParticipant($event)" [submitText]="'Eintragen'"></azas-participantform>
 			<button (click)="abortAdd()">Abbrechen</button>
@@ -34,7 +34,7 @@ import {Observable} from 'rxjs/Rx';
 			<azas-participantform *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipant.info" [submitText]="'Ändern'"></azas-participantform>
 			<button (click)="abortEdit()">Abbrechen</button>
 		</div>
-		<button *ngIf="!displayAddParticipant" (click)="addParticipant()">Teilnehmer hinzufügen</button>
+		<button *ngIf="!displayAddParticipant && meta.allowAdd" (click)="addParticipant()">Teilnehmer hinzufügen</button>
 		<h3>Maskottchen</h3>
 		<azas-displaymascots [mascots]="council.mascots" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}]" (action)="onMascotsAction($event)"></azas-displaymascots>
 		<div *ngIf="displayAddMascot">
@@ -57,11 +57,22 @@ export class CouncilComponent implements OnInit {
 
 	private council: Council = null;
 	private error: string = '';
+	private actions: any[] = [];
 
 	constructor(private azas: AzasService, private zone: NgZone) {}
 
 	public ngOnInit() {
 		this.reloadCouncil();
+		if (this.meta.allowEdit) {
+			this.actions.push({id: 0, name: 'Ändern'});
+		}
+		if (this.meta.allowAdd) {
+			this.actions.push({id: 1, name: 'Löschen'});
+		}
+		if (this.meta.allowEdit) {
+			this.actions.push({id: 2, name: '\u{2191}'});
+			this.actions.push({id: 3, name: '\u{2193}'});
+		}
 	}
 
 	private onParticipantsAction(action: {id: number, target: Participant}) {

@@ -179,7 +179,6 @@ trait RestService extends HttpService {
   }
 
   def handleAddMascot(req: AddMascotRequest): Future[GenericResponse] = {
-    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -195,7 +194,6 @@ trait RestService extends HttpService {
   }
 
   def handleEditMascot(req: EditMascotRequest): Future[GenericResponse] = {
-    if (!config.allowEdit) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -214,7 +212,6 @@ trait RestService extends HttpService {
   }
 
   def handleDelMascot(req: DelMascotRequest): Future[GenericResponse] = {
-    if (!config.allowAdd) return Future.failed(new ForbiddenException)
     db.findCouncilByToken(req.token) flatMap {
       case None ⇒ throw new ForbiddenException
       case Some(council) ⇒
@@ -254,7 +251,9 @@ trait RestService extends HttpService {
         case (ty, fields) ⇒
           (ty, JsArray((fields map { _.toJson }).toVector))
       }),
-      numDisplayedParticipantFields = Config.meta.numDisplayedParticipantFields
+      numDisplayedParticipantFields = Config.meta.numDisplayedParticipantFields,
+      allowAdd = Config.api.allowAdd,
+      allowEdit = Config.api.allowEdit
     ))
   }
 }

@@ -42,7 +42,7 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit val dumpDataResponse = jsonFormat3(DumpDataResponse)
   implicit val genericResponse = jsonFormat1(GenericResponse)
   implicit val genericRequest = jsonFormat1(GenericRequest)
-  implicit val metaInfoResponse = jsonFormat4(MetaInfoResponse)
+  implicit val metaInfoResponse = jsonFormat6(MetaInfoResponse)
 
   implicit val schemeTypeField = jsonFormat5(Config.scheme.Field)
 }

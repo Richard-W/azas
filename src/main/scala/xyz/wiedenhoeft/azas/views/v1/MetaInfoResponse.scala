@@ -6,5 +6,7 @@ case class MetaInfoResponse(
   title: String,
   participantType: String,
   types: JsObject,
-  numDisplayedParticipantFields: Int
+  numDisplayedParticipantFields: Int,
+  allowEdit: Boolean,
+  allowAdd: Boolean
 )

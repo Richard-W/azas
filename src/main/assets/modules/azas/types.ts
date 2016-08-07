@@ -40,6 +40,8 @@ export interface MetaInfo {
 	participantType: string;
 	types: { [name: string]: Field[] };
 	numDisplayedParticipantFields: number;
+	allowAdd: boolean;
+	allowEdit: boolean;
 }
 
 export interface DataDump {
