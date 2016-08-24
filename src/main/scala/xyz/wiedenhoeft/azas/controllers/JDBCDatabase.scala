@@ -43,7 +43,9 @@ class JDBCDatabase extends Database {
         }
       case None ⇒ DriverManager.getConnection(config.url)
     }
-    f(connection)
+    val rv = f(connection)
+    connection.close()
+    rv
   }
 
   @tailrec private def resultHelper[T](resultSet: ResultSet, seq: Seq[T] = Seq[T]())(f: ResultSet ⇒ T): Seq[T] = {
