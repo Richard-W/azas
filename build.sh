@@ -24,7 +24,7 @@ rm -rf ${builddir}/sbt
 tar --directory ${builddir} -xzf ${sbt_archive_path}
 
 # Remove old artifacts
-rm -f ${dir}/jvm/target/scala-2.11/azas-assembly*
+rm -f ${dir}/target/scala-2.11/azas-assembly*
 
 cd ${dir}
 ${builddir}/sbt/bin/sbt assembly
