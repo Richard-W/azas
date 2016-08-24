@@ -71,7 +71,8 @@ libraryDependencies ++= {
 
     "org.webjars.npm"    % "systemjs"             % "0.19.35",
     "org.webjars.npm"    % "rxjs"                 % "5.0.0-beta.5",
-    "org.webjars.npm"    % "angular2"             % "2.0.0-beta.15"
+    "org.webjars.npm"    % "angular2"             % "2.0.0-beta.15",
+    "org.webjars.npm"    % "es6-shim"             % "0.35.1"
   )
 }
 
