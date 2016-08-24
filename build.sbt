@@ -223,6 +223,7 @@ maintainerScripts in Debian := maintainerScriptsAppend((maintainerScripts in Deb
     """
       |systemctl daemon-reload
       |systemctl try-restart azas
+      |mkdir -p /var/lib/azas
       |chown -R azas:azas /var/lib/azas
       |chmod -R 750 /var/lib/azas
       |chown root:root /etc/azas.conf
