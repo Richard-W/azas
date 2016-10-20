@@ -31,7 +31,7 @@ export interface Council {
 export interface Field {
 	name: string;
 	field: string;
-	type: string;
+	ty: string;
 	options: string[];
 }
 
