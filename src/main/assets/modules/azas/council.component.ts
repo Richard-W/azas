@@ -39,6 +39,10 @@ import {Observable} from 'rxjs/Rx';
 			<azas-participantform *ngIf="editeeParticipant != null" [meta]="meta" (submitForm)="onSubmitEditParticipant($event)" [model]="editeeParticipant.info" [submitText]="'Ändern'"></azas-participantform>
 			<button (click)="abortEdit()">Abbrechen</button>
 		</div>
+		<div *ngIf="displayeeParticipant != null">
+			<span *ngFor="#info of displayeeInfo"><b>{{info.key}}:</b> {{info.value}}<br /></span>
+			<button (click)="abortDisplay()">Nicht mehr anzeigen</button>
+		</div>
 		<button *ngIf="!displayAddParticipant && meta.allowAdd" (click)="addParticipant()">Teilnehmer hinzufügen</button>
 		<h3>Maskottchen</h3>
 		<azas-displaymascots [mascots]="council.mascots" [actions]="[{id: 0, name: 'Ändern'}, {id: 1, name: 'Löschen'}]" (action)="onMascotsAction($event)"></azas-displaymascots>
@@ -71,6 +75,8 @@ export class CouncilComponent implements OnInit {
 		this.reloadCouncil();
 		if (this.meta.allowEdit) {
 			this.actions.push({id: 0, name: 'Ändern'});
+		} else {
+			this.actions.push({id: 4, name: 'Anzeigen'});
 		}
 		if (this.meta.allowAdd) {
 			this.actions.push({id: 1, name: 'Löschen'});
@@ -104,6 +110,9 @@ export class CouncilComponent implements OnInit {
 					this.swapPriority(index, index + 1);
 				}
 			}
+			break;
+		case 4:
+			this.displayParticipant(action.target);
 			break;
 		}
 	}
@@ -210,6 +219,29 @@ export class CouncilComponent implements OnInit {
 		return fields;
 	}
 
+	private displayeeParticipant: Participant = null;
+	private displayeeInfo: any[] = null;
+
+	private displayParticipant(p: Participant) {
+		this.displayeeParticipant = p;
+		this.displayeeInfo = [];
+		this.dpHelper(this.meta.participantType, this.displayeeParticipant.info);
+	}
+
+	private dpHelper(tp: string, info: any) {
+		var fields = this.meta.types[tp];
+		for (var field of fields) {
+			if (field.ty == "String" || field.ty == "Int" || field.ty == "Boolean") {
+				this.displayeeInfo.push({ key: field.name, value: info[field.field]});
+			} else {
+				this.dpHelper(field.ty, info[field.field]);
+			}
+		}
+	}
+
+	private abortDisplay() {
+		this.displayeeParticipant = null;
+	}
 
 	/* Add participant */
 
