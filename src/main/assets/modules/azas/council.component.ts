@@ -232,7 +232,9 @@ export class CouncilComponent implements OnInit {
 		var fields = this.meta.types[tp];
 		for (var field of fields) {
 			if (field.ty == "String" || field.ty == "Int" || field.ty == "Boolean") {
-				this.displayeeInfo.push({ key: field.name, value: info[field.field]});
+				if (ParticipantFormComponent.decideFormFieldDisplay(info, field.field)) {
+					this.displayeeInfo.push({ key: field.name, value: info[field.field]});
+				}
 			} else {
 				this.dpHelper(field.ty, info[field.field]);
 			}
