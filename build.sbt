@@ -34,7 +34,7 @@ organization := "xyz.wiedenhoeft"
  * version is fixed and you can only fix bugs in minor releases by incrementing the patch version number
  * (z from x.y.z)
  */
-version := "2.0.1"
+version := "2.0.2"
 
 scalaVersion := "2.11.8"
 
