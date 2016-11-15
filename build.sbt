@@ -53,7 +53,7 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
  */
 libraryDependencies ++= {
   val akkaVersion = "2.4.12"
-  val sprayVersion = "1.3.3"
+  val sprayVersion = "1.3.4"
 
   Seq(
     "com.typesafe.akka" %% "akka-actor"           % akkaVersion,
