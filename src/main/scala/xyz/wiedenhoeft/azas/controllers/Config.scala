@@ -100,6 +100,11 @@ object Config {
     private lazy val config = Config.config.getConfig("http")
 
     /**
+     * Address spray bind to
+     */
+    lazy val address = if (config.hasPath("address")) Some(config.getString("address")) else None
+
+    /**
      * Port spray listens on
      */
     lazy val port = config.getInt("port")
