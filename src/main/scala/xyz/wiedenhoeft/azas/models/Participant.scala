@@ -25,11 +25,11 @@ import scala.concurrent.ExecutionContext
  * Database representation of a participant
  */
 case class Participant(
-    id: String,
-    councilId: String,
-    priority: Int,
-    approved: Boolean,
-    info: JsObject
+  id: String,
+  councilId: String,
+  priority: Int,
+  approved: Boolean,
+  info: JsObject
 ) {
   def insert(implicit executor: ExecutionContext, db: Database) = db.insertParticipant(this)
   def update(implicit executor: ExecutionContext, db: Database) = db.updateParticipant(this)

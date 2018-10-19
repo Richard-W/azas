@@ -47,6 +47,7 @@ scalacOptions := Seq("-target:jvm-1.7")
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(AlignSingleLineCaseStatements, true)
   .setPreference(PreserveSpaceBeforeArguments, true)
+  .setPreference(DanglingCloseParenthesis, Force)
 
 /* Specify the dependencies of this project. All coordinates here will
  * be retrieved either from the web or your local cache.
@@ -70,7 +71,7 @@ libraryDependencies ++= {
     "io.spray"          %% "spray-testkit"        % sprayVersion  % "test",
 
     "org.webjars.npm"    % "systemjs"             % "0.19.35",
-    "org.webjars.npm"    % "rxjs"                 % "5.0.0-beta.5",
+    "org.webjars.npm"    % "rxjs"                 % "5.5.10",
     "org.webjars.npm"    % "angular2"             % "2.0.0-beta.15",
     "org.webjars.npm"    % "es6-shim"             % "0.35.1"
   )
@@ -125,13 +126,13 @@ copyModules := {
       }
   }
   /* Use the mappings to copy the files to their destination */
-  IO.copy(copy, overwrite = true)
+  IO.copy(copy, overwrite = true, preserveLastModified = false, preserveExecutable = false)
   /* Return the list of destination files */
   copy map { case (_, dest) ⇒ dest }
 }
 
 /* Register copyModules as a resource generator */
-(resourceGenerators in Compile) <+= copyModules
+(resourceGenerators in Compile) += { copyModules }
 
 /* Specify merge strategy for jar generation */
 assemblyMergeStrategy in assembly := { path ⇒

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-which wget 2> /dev/null > /dev/null
-wget_found=$?
-if [ ${wget_found} != 0 ]; then
-    echo "Failure: Application ‘wget“ not found"
+which curl 2> /dev/null > /dev/null
+curl_found=$?
+if [ ${curl_found} != 0 ]; then
+    echo "Failure: Application 'curl' not found"
     exit 1
 fi
 
@@ -17,7 +17,7 @@ if [ ! -d ${builddir} ]; then
 fi
 
 if [ ! -f ${sbt_archive_path} ]; then
-    wget -O ${sbt_archive_path} https://dl.bintray.com/sbt/native-packages/sbt/${sbt_version}/sbt-${sbt_version}.tgz
+    curl -L -o ${sbt_archive_path} https://piccolo.link/sbt-${sbt_version}.tgz
 fi
 
 rm -rf ${builddir}/sbt

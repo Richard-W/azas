@@ -24,10 +24,10 @@ import scala.concurrent.ExecutionContext
  * Database representation of a mascot
  */
 case class Mascot(
-    id: String,
-    councilId: String,
-    fullName: String,
-    nickName: String
+  id: String,
+  councilId: String,
+  fullName: String,
+  nickName: String
 ) {
 
   def insert(implicit executor: ExecutionContext, db: Database) = db.insertMascot(this)

@@ -24,11 +24,11 @@ import scala.concurrent.{ Future, ExecutionContext }
  * Database representation of a council
  */
 case class Council(
-    id: String,
-    university: String,
-    address: String,
-    email: String,
-    token: String
+  id: String,
+  university: String,
+  address: String,
+  email: String,
+  token: String
 ) {
   def insert(implicit db: Database, executor: ExecutionContext): Future[Council] = db.insertCouncil(this)
 }
